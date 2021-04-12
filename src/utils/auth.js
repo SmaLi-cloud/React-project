@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie'
-const timeKey = 'react-timestamp-key' // 设置一个独一无二的key
+const timeKey = 'react-timestamp-key'
 const TokenKey = 'react-lbms-token'
 
 export function getToken() {
@@ -7,7 +7,7 @@ export function getToken() {
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+  return Cookies.set(TokenKey, token,{ expires: 1 })
 }
 
 export function removeToken() {

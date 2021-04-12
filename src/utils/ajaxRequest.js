@@ -1,5 +1,4 @@
 import request from '@/utils/request';
-import Cookie from 'js-cookie';
 import getguid from '@/utils/guid';
 import { getToken } from './auth';
 
@@ -7,8 +6,8 @@ request.interceptors.request.use((url, options) => {
   const headers = {
     guid: getguid(),
     // 'Content-Type': 'application/json',
-    // Accept: 'application/json',
-    // userID  cookie
+    Accept: 'application/json',
+    // userID 可以通过请求传递参数
     // Cookies.set('name', 'value', { expires: 7 })
   };
   if (
@@ -17,8 +16,9 @@ request.interceptors.request.use((url, options) => {
     options.method === 'delete' ||
     options.method === 'get'
   ) {
-    if (getToken()) {
-      requestData.Authorization = `Bearer ${getToken()}`;
+    if (true) {
+      headers.Authorization = `Bearer ${getToken()}`;
+      // headers.Authorization = `Bearer hhddskjgjkjfggjhdhkfjk`;
     }
     return {
       url,
@@ -27,12 +27,13 @@ request.interceptors.request.use((url, options) => {
   }
 });
 
-// request.interceptors.response.use(async (response) => {
-//   const data = await response.clone().json();
-//   if (data && data.need_login) {
-//     // console.log('完成响应');
-//   }
-//   return response;
-// });
+request.interceptors.response.use(async (response) => {
+  // const data = await response.clone().json();
+  const data = await response.clone();
+  if (data) {
+    // console.log('完成响应');
+  }
+  return response;
+});
 
 export default request;

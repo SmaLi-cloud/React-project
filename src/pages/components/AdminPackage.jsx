@@ -1,6 +1,6 @@
 function roleCheck(ChildComponent, srcProps, child) {
-    console.log("roleCheck");
-    debugger;
+    // console.log("roleCheck");
+    // debugger;
     if (
       typeof ChildComponent == "function" &&
       new ChildComponent({}).checkRole

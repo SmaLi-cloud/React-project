@@ -46,6 +46,9 @@ const Login = (props) => {
           autoLogin: true,
         }}
         submitter={{
+          searchConfig: {
+            submitText: '点击登录',
+          },
           render: (_, dom) => dom.pop(),
           submitButtonProps: {
             loading: submitting,

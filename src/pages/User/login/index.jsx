@@ -222,29 +222,7 @@ const Login = (props) => {
             />
           </>
         )}
-        <div
-          style={{
-            marginBottom: 24,
-          }}
-        >
-          <ProFormCheckbox noStyle name="autoLogin">
-            <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
-          </ProFormCheckbox>
-          <a
-            style={{
-              float: 'right',
-            }}
-          >
-            <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
-          </a>
-        </div>
       </ProForm>
-      <Space className={styles.other}>
-        <FormattedMessage id="pages.login.loginWith" defaultMessage="其他登录方式" />
-        <AlipayCircleOutlined className={styles.icon} />
-        <TaobaoCircleOutlined className={styles.icon} />
-        <WeiboCircleOutlined className={styles.icon} />
-      </Space>
     </div>
   );
 };

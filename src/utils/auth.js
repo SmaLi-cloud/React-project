@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie'
-const timeKey = 'react-timestamp-key'
+// const timeKey = 'react-timestamp-key'
 const TokenKey = 'react-lbms-token'
 
 export function getToken() {

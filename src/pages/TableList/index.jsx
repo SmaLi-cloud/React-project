@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message, Input, Drawer, Table } from 'antd';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
@@ -89,6 +89,38 @@ const TableList = () => {
   /** 国际化配置 */
 
   const intl = useIntl();
+  const dataSource = [
+    {
+      key: '1',
+      name: '胡彦斌',
+      age: 32,
+      address: '西湖区湖底公园1号',
+    },
+    {
+      key: '2',
+      name: '胡彦祖',
+      age: 42,
+      address: '西湖区湖底公园1号',
+    },
+  ];
+  
+  const columns2 = [
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '年龄',
+      dataIndex: 'age',
+      key: 'age',
+    },
+    {
+      title: '住址',
+      dataIndex: 'address',
+      key: 'address',
+    },
+  ];
   const columns = [
     {
       title: (
@@ -97,9 +129,11 @@ const TableList = () => {
           defaultMessage="规则名称"
         />
       ),
-      dataIndex: 'name',
+      dataIndex: 'owner',
       tip: '规则名称是唯一的 key',
       render: (dom, entity) => {
+        console.log(entity);
+        console.log(dom);
         return (
           <a
             onClick={() => {
@@ -165,7 +199,7 @@ const TableList = () => {
       ),
       sorter: true,
       dataIndex: 'updatedAt',
-      valueType: 'dateTime',
+      valueType: 'date',
       renderFormItem: (item, { defaultRender, ...rest }, form) => {
         const status = form.getFieldValue('status');
 
@@ -239,6 +273,8 @@ const TableList = () => {
           },
         }}
       />
+
+<Table dataSource={dataSource} columns={columns2} />;
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
           extra={

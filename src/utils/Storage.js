@@ -1,17 +1,23 @@
-import Cookies from 'js-cookie'
-const TokenKey = 'react-lbms-token'
-const hasSession = typeof window.localStorage == 'undefined' ? true: false
-export function getToken() {
-  return hasSession ? localStorage.getItem(TokenKey) : Cookies.get(TokenKey)
+import Cookies from 'js-cookie';
+
+const hasSession = typeof window.location.sessionStorage == 'undefined' ? true : false;
+function get(key) {
+  return hasSession ? sessionStorage.getItem(key) : Cookies.get(key);
 }
 
-export function setToken(token) {
-  return hasSession ? localStorage.setItem(TokenKey, token) : Cookies.set(TokenKey, token,{ expires: 1 })
+function set(key, value) {
+  return hasSession ? sessionStorage.setItem(key, value) : Cookies.set(key, value);
 }
 
-export function removeToken() {
-  if(hasSession){
-    return localStorage.removeItem(TokenKey)
+function remove(key) {
+  if (hasSession) {
+    return sessionStorage.removeItem(key);
   }
-  return Cookies.remove(TokenKey)
+  return Cookies.remove(key);
 }
+const Storage = {
+  get,
+  set,
+  remove,
+};
+export default Storage;

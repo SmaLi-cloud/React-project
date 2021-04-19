@@ -13,6 +13,8 @@ import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-desi
 import { useIntl, connect, FormattedMessage } from 'umi';
 import { getFakeCaptcha } from '@/services/login';
 import styles from './index.less';
+import { callAPI } from '@/utils/Tools';
+
 
 const LoginMessage = ({ content }) => (
   <Alert
@@ -59,8 +61,9 @@ const Login = (props) => {
           },
         }}
         onFinish={(values) => {
-          handleSubmit(values);
-          return Promise.resolve();
+          // handleSubmit(values);
+          callAPI('/api/login/account',{...values,type: "account"})
+          // return Promise.resolve();
         }}
       >
         <Tabs activeKey={type} onChange={setType}>

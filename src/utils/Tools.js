@@ -1,6 +1,6 @@
-import { timeout, prefix } from "config";
-import { getToken } from "./Storage";
-import { notification } from 'antd';
+import config from "./config";
+import Storage from "./Storage";
+import request from "umi-request"
 
 /**
  * 随机码GUID
@@ -15,43 +15,44 @@ function getGuid() {
 }
 
 /**
- * @param {"/login"} action 
- * @param {Object} data 
- * @param {*} successCallback 
- * @param {*} errorCallback 
+ * @param {"api/login"} action 
+ * @param { Object,Array } data 
  */
 function callAPI(action, data, successCallback, errorCallback) {
-  const token = getToken();
+  const token = Storage.get('VO_TOKEN');
   const headers = {
     'Request-Unid': getGuid(),
     Accept: 'application/json',
+    'Content-Type': 'application/x-www-form-urlencoded',
     'Vo-Token': token,
   };
   const options = {
-    prefix,
+    prefix: config.prefix,
     method: 'POST',
     data: toLine(data),
-    timeout,
+    timeout: config.timeout,
     headers,
   }
   request(action, options).then(result => {
-    if(!result.need_login){
-      window.location.href ='/login';
+    if(action !== "api/login/count" && !result.needLogin){
+      const url = window.location.href;
+      // window.location.href ='/user/login?redirect='+url;
     }
-    successCallback(result)
+    if(successCallback) {
+      successCallback(toHump(result))
+    }
   }).catch(err => {
-    errorCallback(err)
+    logMsg(err)
+    if(errorCallback){
+      errorCallback(err)
+    }
   })
 }
 
-function successCallback(result) {
- const { data } = toHump(result)
-}
-function errorCallback(error) {
-  const { message } = error.response;
-  notification.error({
-    message,
-  });
+function logMsg(msg){
+  if(config.isDebug) {
+    console.log(msg);
+  }
 }
 
 /**
@@ -96,4 +97,5 @@ function toLine(data) {
 export {
   getGuid,
   callAPI,
+  logMsg
 };

@@ -1,6 +1,6 @@
-import config from "./config";
-import Storage from "./Storage";
-import request from "umi-request"
+import config from './config';
+import Storage from './Storage';
+import request from 'umi-request';
 
 /**
  * 随机码GUID
@@ -15,8 +15,8 @@ function getGuid() {
 }
 
 /**
- * @param {"api/login"} action 
- * @param { Object,Array } data 
+ * @param {"user:login"} action
+ * @param { Object,Array } data
  */
 function callAPI(action, data, successCallback, errorCallback) {
   const token = Storage.get('VO_TOKEN');
@@ -29,73 +29,78 @@ function callAPI(action, data, successCallback, errorCallback) {
   const options = {
     prefix: config.prefix,
     method: 'POST',
-    data: toLine(data),
+    data: humpToLine(data),
     timeout: config.timeout,
     headers,
-  }
-  request(action, options).then(result => {
-    if(action !== "api/login/count" && !result.needLogin){
-      const url = window.location.href;
-      // window.location.href ='/user/login?redirect='+url;
-    }
-    if(successCallback) {
-      successCallback(toHump(result))
-    }
-  }).catch(err => {
-    logMsg(err)
-    if(errorCallback){
-      errorCallback(err)
-    }
-  })
+  };
+  request(action, options)
+    .then((result) => {
+      if (action !== 'api/login/count' && !result.needLogin) {
+        const url = encodeURIComponent(window.location.href);
+        // window.location.href ='/user/login?redirect='+url;
+      }
+      if (successCallback) {
+        successCallback(lineToHump(result));
+      }
+    })
+    .catch((err) => {
+      logMsg(err);
+      if (errorCallback) {
+        errorCallback(err);
+      }
+    });
 }
 
-function logMsg(msg){
-  if(config.isDebug) {
+function logMsg(msg) {
+  if (config.isDebug) {
     console.log(msg);
   }
 }
 
-/**
- * @param {Array, Object}
- * @returns Line to Hump
- */
-function toHump(data) {
+function lineToHump(data) {
   if (data instanceof Array) {
-      data.forEach(v => toHump(v))
+    data.forEach((v) => lineToHump(v));
   } else if (data instanceof Object) {
-      Object.keys(data).forEach(function (key) {
-          let newKey = key.replace(/_(\w)/g, (all, letter)=>  letter.toUpperCase())
-          if (newKey !== key) {
-              data[newKey] = data[key]
-              delete data[key]
-          }
-          toHump(data[newKey])
-      })
+    Object.keys(data).forEach(function (key) {
+      let newKey = key.replace(/_(\w)/g, (all, letter) => letter.toUpperCase());
+      if (newKey !== key) {
+        data[newKey] = data[key];
+        delete data[key];
+      }
+      lineToHump(data[newKey]);
+    });
   }
   return data;
 }
 
-/**
- * @param {Array, Object} 
- * @returns Hump to Line
- */
-function toLine(data) {
+function humpToLine(data) {
   if (data instanceof Array) {
-      data.forEach(v => toLine(v))
+    data.forEach((v) => humpToLine(v));
   } else if (data instanceof Object) {
-      Object.keys(data).forEach(function (key) {
-          let newKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
-          if (newKey !== key) {
-              data[newKey] = data[key]
-              delete data[key]
-          }
-          toLine(data[newKey])
-      })
+    Object.keys(data).forEach(function (key) {
+      let newKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      if (newKey !== key) {
+        data[newKey] = data[key];
+        delete data[key];
+      }
+      humpToLine(data[newKey]);
+    });
   }
   return data;
 }
-export {
-  getGuid,
-  callAPI,
-  logMsg
-};
+
+function getUrlParams() {
+  let url = window.location.search;
+  let index = url.indexOf('?');
+  let obj = {};
+  if (index !== -1) {
+    let str = url.substr(1);
+    let arr = str.split('&');
+    for (let i = 0; i < arr.length; i++) {
+      obj[arr[i].split('=')[0]] = arr[i].split('=')[1];
+    }
+  }
+  return obj;
+}
+
+export { getGuid, callAPI, logMsg, getUrlParams };

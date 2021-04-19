@@ -5,6 +5,6 @@ export async function query() {
 export async function queryCurrent() {
   return request('/api/currentUser');
 }
-export async function queryNotices() {
+export async function queryNotices(username, password) {
   return request('/api/notices');
 }

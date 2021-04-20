@@ -102,5 +102,13 @@ function getUrlParams() {
   }
   return obj;
 }
+function getComponet(typeName) {
+  for (var name in window) {
+    if (name == typeName) {
+      return window[name];
+    }
+  }
+  return typeName;
+}
 
-export { getGuid, callAPI, logMsg, getUrlParams };
+export { getGuid, callAPI, logMsg, getUrlParams, getComponet };

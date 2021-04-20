@@ -8,6 +8,11 @@ import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import UpdateForm from './components/UpdateForm';
 import { queryRule, updateRule, addRule, removeRule } from './service';
+import Storage from '@/utils/Storage';
+import roleCheck from '../components/AdminPackage'
+
+
+
 /**
  * 添加节点
  *
@@ -89,6 +94,9 @@ const TableList = () => {
   /** 国际化配置 */
 
   const intl = useIntl();
+  const permissions =JSON.parse(Storage.get('permission'))
+
+  console.log(permissions);
   const dataSource = [
     {
       key: '1',
@@ -104,23 +112,38 @@ const TableList = () => {
     },
   ];
   
-  const columns2 = [
+  const columns3 = [
     {
       title: '姓名',
       dataIndex: 'name',
-      key: 'name',
+      key: 'admin',
     },
     {
       title: '年龄',
       dataIndex: 'age',
       key: 'age',
+      render: (text, record, index)=>{
+        const Btn = roleCheck("button", "operator","edit",text)
+        return <Btn />
+      }
     },
     {
       title: '住址',
       dataIndex: 'address',
-      key: 'address',
+      key: 'operator',
+      render: (text, record, index)=>{
+        const Btn = roleCheck("button", "operator","edit",text)
+        return <Btn />
+      }
     },
   ];
+  const columns2 = columns3.filter(coli=>{
+   let newcol = permissions.some(i=>coli.key == i)
+    if(newcol){
+      return coli;
+    }
+  })
+  console.log(columns2);
   const columns = [
     {
       title: (
@@ -132,8 +155,8 @@ const TableList = () => {
       dataIndex: 'owner',
       tip: '规则名称是唯一的 key',
       render: (dom, entity) => {
-        console.log(entity);
-        console.log(dom);
+        // console.log(entity);
+        // console.log(dom);
         return (
           <a
             onClick={() => {
@@ -244,6 +267,8 @@ const TableList = () => {
   ];
   return (
     <PageContainer>
+<Table dataSource={dataSource} columns={columns2} />;
+
       <ProTable
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
@@ -274,7 +299,8 @@ const TableList = () => {
         }}
       />
 
-<Table dataSource={dataSource} columns={columns2} />;
+
+
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
           extra={

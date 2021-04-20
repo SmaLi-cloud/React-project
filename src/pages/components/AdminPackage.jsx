@@ -27,7 +27,7 @@ function roleCheck(ChildComponent, opCode, permissions,value) {
       console.log("you click the button");
     }
     render() {
-
+      //需要解决 opCode 问题，方案1:不停循环，方案2：待定，但是如果需要看功能，功能里可能是data数据或input或button
       if (this.state.opCode = "admin") {
         // custom component
         if (typeof ChildComponent == "function"){
@@ -47,7 +47,7 @@ function roleCheck(ChildComponent, opCode, permissions,value) {
           return <ChildComponent {...this.props} key ={this.props.index} onClick = {()=> this.delClick()}>{value}</ChildComponent>  
         }
       }
-
+      //问题代码 等待解决
       if (
         typeof ChildComponent == "object" && permissions == "edit"
       ) {

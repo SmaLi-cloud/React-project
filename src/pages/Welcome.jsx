@@ -3,7 +3,7 @@ import React from 'react';
 import ProTable from '@ant-design/pro-table';
 import { DownOutlined } from '@ant-design/icons';
 import Storage from '@/utils/Storage';
-import roleCheck from './components/AdminPackage'
+import roleCheck from '@/pages/components/AdminPackage'
 import { getComponet } from '../utils/Tools'
 const RoleMap = {
     admin: {
@@ -80,7 +80,7 @@ const MemberList = () => {
             dataIndex: 'x',
             valueType: 'option',
             render: (_, record) => {
-              let Compant1 = roleCheck(Button,'admin','edit',"编辑");
+              let Compant1 = roleCheck(Button,'admin','del',"编辑");
                 let node = renderRemoveUser('退出');
                 if (record.role === 'admin') {
                 Compant1 = roleCheck("a",'operator','add',"查看");

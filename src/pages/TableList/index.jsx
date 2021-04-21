@@ -9,6 +9,7 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import UpdateForm from './components/UpdateForm';
 import { queryRule, updateRule, addRule, removeRule } from './service';
 import Storage from '@/utils/Storage';
+import roleCheck2 from '../components/AdminPackage2'
 import roleCheck from '../components/AdminPackage'
 
 
@@ -95,8 +96,8 @@ const TableList = () => {
 
   const intl = useIntl();
   const permissions =JSON.parse(Storage.get('permission'))
-
-  console.log(permissions);
+  const admin =JSON.parse(Storage.get('admin'))
+  const opertar =JSON.parse(Storage.get('operator'))
   const dataSource = [
     {
       key: '1',
@@ -116,24 +117,37 @@ const TableList = () => {
     {
       title: '姓名',
       dataIndex: 'name',
-      key: 'admin',
+      key: 'operator',
     },
     {
       title: '年龄',
       dataIndex: 'age',
       key: 'age',
-      render: (text, record, index)=>{
-        const Btn = roleCheck("button", "operator","edit",text)
-        return <Btn />
+      render: (text,reload)=>{
+        // const arr=[];
+        // admin.forEach((v,i) => {
+        //   const Btn = roleCheck(Button, "operator",v,v);
+        //   arr.push(<Btn index={i} onClick = {()=> console.log(reload.name+"点击")} />)
+        //   });
+        // return arr;
+        const Btn = roleCheck2(Button, 'operator',opertar)
+        return <Btn />;
       }
     },
     {
       title: '住址',
       dataIndex: 'address',
-      key: 'operator',
-      render: (text, record, index)=>{
-        const Btn = roleCheck("button", "operator","edit",text)
-        return <Btn />
+      key: 'admin',
+      render: _=>{
+        const arr=[];
+        // opertar.forEach((v,i) => {
+        //   const Btn = roleCheck(Button, "operator",v,v);
+        //   arr.push(<Btn index={i} />)
+        //   });
+        // const Btn = roleCheck("button", "opertar","del",text);
+        
+        const Btn = roleCheck2(Button, 'admin',admin)
+        return <Btn />;
       }
     },
   ];

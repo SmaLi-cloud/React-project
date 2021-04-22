@@ -4,6 +4,8 @@ import ProTable from '@ant-design/pro-table';
 import { DownOutlined } from '@ant-design/icons';
 import Storage from '@/utils/Storage';
 import roleCheck from '@/pages/components/AdminPackage'
+import roleCheck2 from '@/pages/components/AdminPackage'
+
 import { getComponet } from '../utils/Tools'
 const RoleMap = {
     admin: {
@@ -35,16 +37,13 @@ for (let i = 0; i < 5; i += 1) {
         email: emails[i % 4],
         phone: phones[i % 4],
         permission: permissions[i % 4],
-        index:0
+        index: 0
     });
 }
-const roleMenu = (<Menu>
-    <Menu.Item key="admin">管理员</Menu.Item>
-    <Menu.Item key="operator">操作员</Menu.Item>
-  </Menu>);
+
 const MemberList = () => {
     const renderRemoveUser = (text) => (<Popconfirm key="popconfirm" title={`确认${text}吗?`} okText="是" cancelText="否">
-      <a>{text}</a>
+        <a>{text}</a>
     </Popconfirm>);
     const columns = [
         {
@@ -53,9 +52,9 @@ const MemberList = () => {
             valueType: 'avatar',
             width: 150,
             render: (_, record) => (<>
-          {record.nickName}
-          {/* {console.log(record.nickName)} */}
-        </>),
+                {record.nickName}
+                {/* {console.log(record.nickName)} */}
+            </>),
         },
         {
             dataIndex: 'email',
@@ -69,9 +68,9 @@ const MemberList = () => {
             dataIndex: 'role',
             title: '角色',
             render: (_, record) => (
-          <span>
-            {RoleMap[record.role || 'admin'].name} 
-          </span>
+                <span>
+                    {RoleMap[record.role || 'admin'].name}
+                </span>
             )
 
         },
@@ -80,28 +79,34 @@ const MemberList = () => {
             dataIndex: 'x',
             valueType: 'option',
             render: (_, record) => {
-              let Compant1 = roleCheck(Button,'admin','del',"编辑");
-                let node = renderRemoveUser('退出');
+                const arr = [];
                 if (record.role === 'admin') {
-                Compant1 = roleCheck("a",'operator','add',"查看");
-                node = renderRemoveUser('移除');
+                    let Compant1 = roleCheck(Button, 'admin', 'del', "删除");
+                    let Compant2 = roleCheck(Button, 'operator', 'out', "退出");
+                    arr.push(<Compant1 />, <Compant2 />)
+                }
+                if (record.role === 'operator') {
+                    let  Compant1 = roleCheck("a", 'operator', 'edit', "编辑");
+                    let  Compant2 = roleCheck(Button, 'operator', 'add', "添加");
+                    let Compant3 = roleCheck(Button, 'operator', 'del', "删除");
+                    arr.push(<Compant1 />, <Compant2 />, <Compant3 />)
                 }
 
                 // return [<a key="edit" onClick={() => {console.log("sss");}}>编辑</a>, <Popconfirm key="popconfirm" title={`确认吗?`} okText="是" cancelText="否" ><a>ssss</a></Popconfirm>];
-                return [<Compant1 index= {record.index} key={record.index++} danger={1} />, node];
+                return arr;
 
             },
         },
     ];
     return (<ProTable columns={columns} request={(params, sorter, filter) => {
-            // 表单搜索项会从 params 传入，传递给后端接口。
-            // console.log(params, sorter, filter);
-            return Promise.resolve({
-                data: tableListDataSource,
-                success: true,
-            });
-        }} rowKey="outUserNo" pagination={{
-            showQuickJumper: true,
-        }} toolBarRender={false} search={false}/>);
+        // 表单搜索项会从 params 传入，传递给后端接口。
+        // console.log(params, sorter, filter);
+        return Promise.resolve({
+            data: tableListDataSource,
+            success: true,
+        });
+    }} rowKey="outUserNo" pagination={{
+        showQuickJumper: true,
+    }} toolBarRender={false} search={false} />);
 };
 export default MemberList;

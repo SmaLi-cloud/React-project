@@ -37,18 +37,32 @@ function roleCheck(ChildComponent, opCode, permissions,value) {
         }
         else if(typeof ChildComponent == "object") {
           // Antd component or chorme component 
-          // 编辑按钮
+
           if ( permissions == "edit") {
             return <ChildComponent {...this.props} key ={this.props.index} onClick = {_=>{ this.props.onClick(); }} type ="primary">{value}</ChildComponent>  
           }
-          // 添加按钮
+
           if (permissions == "add") {
-            return <ChildComponent {...this.props} key ={this.props.index} onClick = {_=> this.addClick()} >{value}</ChildComponent>  
+            const attribute={
+              type: "primary",
+              value: "small",
+              onClick : _=> this.addClick()
+            }
+            return <ChildComponent {...this.props} key ={this.props.index} {...attribute} >{value}</ChildComponent>  
           }
-          // 删除按钮
+
           if (permissions == "del") {
             const attribute={
               danger:true,
+              value: "small",
+              onClick : (data)=> this.delClick(data)
+            }
+            return <ChildComponent {...this.props} key ={this.props.index} {...attribute}>{value}</ChildComponent>  
+          }
+          
+          if (permissions == "out") {
+            const attribute={
+              style:{backgroundColor:"#f50",color:"#fff"},
               value: "small",
               onClick : (data)=> this.delClick(data)
             }

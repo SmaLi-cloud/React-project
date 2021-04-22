@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer, Table } from 'antd';
+import { Button, message, Input, Drawer, Table, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
@@ -107,7 +107,7 @@ const TableList = () => {
     },
     {
       key: '2',
-      name: '胡彦祖',
+      name: 'hellokitty',
       age: 42,
       address: '西湖区湖底公园1号',
     },
@@ -115,12 +115,12 @@ const TableList = () => {
   
   const columns3 = [
     {
-      title: '姓名',
+      title: 'operator',
       dataIndex: 'name',
       key: 'operator',
     },
     {
-      title: '年龄',
+      title: 'age',
       dataIndex: 'age',
       key: 'age',
       render: (text,reload)=>{
@@ -130,12 +130,12 @@ const TableList = () => {
         //   arr.push(<Btn index={i} onClick = {()=> console.log(reload.name+"点击")} />)
         //   });
         // return arr;
-        const Btn = roleCheck2(Button, 'operator',opertar)
+        const Btn = roleCheck2(Tag, 'operator',opertar)
         return <Btn />;
       }
     },
     {
-      title: '住址',
+      title: 'admin',
       dataIndex: 'address',
       key: 'admin',
       render: _=>{
@@ -145,6 +145,8 @@ const TableList = () => {
         //   arr.push(<Btn index={i} />)
         //   });
         // const Btn = roleCheck("button", "opertar","del",text);
+        // return arr;
+
         
         const Btn = roleCheck2(Button, 'admin',admin)
         return <Btn />;

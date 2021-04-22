@@ -1,52 +1,70 @@
 import React from 'react';
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
-import { Card, Typography, Alert } from 'antd';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { useIntl } from 'umi';
+import ProTable from '@ant-design/pro-table';
+import VoTable from '@/pages/components/voTable';
+import { logMsg } from '@/utils/Tools';
+
+
+const columns = [
+    {
+        dataIndex: 'key',
+        valueType: 'indexBorder',
+        width: 48,
+    },
+    {
+        title: '标题',
+        dataIndex: 'name',
+        tip: '标题过长会自动收缩',
+        formItemProps: {
+            rules: [
+                {
+                    required: true,
+                    message: '此项为必填项',
+                },
+            ],
+        },
+    },
+    {
+        title: '状态',
+        dataIndex: 'age',
+        valueType: 'select',
+        valueEnum: {
+            all: { text: '全部', status: 'Default' },
+            open: {
+                text: '未解决',
+                status: 'Error',
+            },
+            closed: {
+                text: '已解决',
+                status: 'Success',
+                disabled: true,
+            },
+            processing: {
+                text: '解决中',
+                status: 'Processing',
+            },
+        },
+    },
+    {
+        title: '标签',
+        dataIndex: 'address',
+        search: false,
+    }
+];
+
 export default () => {
-  const intl = useIntl();
-  return (
-    <PageHeaderWrapper
-      content={intl.formatMessage({
-        id: 'pages.admin.subPage.title',
-        defaultMessage: ' 这个页面只有 admin 权限才能查看',
-      })}
-    >
-      <Card>
-        <Alert
-          message={intl.formatMessage({
-            id: 'pages.welcome.alertMessage',
-            defaultMessage: '更快更强的重型组件，已经发布。',
-          })}
-          type="success"
-          showIcon
-          banner
-          style={{
-            margin: -12,
-            marginBottom: 48,
-          }}
-        />
-        <Typography.Title
-          level={2}
-          style={{
-            textAlign: 'center',
-          }}
-        >
-          <SmileTwoTone /> Ant Design Pro <HeartTwoTone twoToneColor="#eb2f96" /> You
-        </Typography.Title>
-      </Card>
-      <p
-        style={{
-          textAlign: 'center',
-          marginTop: 24,
-        }}
-      >
-        Want to add more pages? Please refer to{' '}
-        <a href="https://pro.ant.design/docs/block-cn" target="_blank" rel="noopener noreferrer">
-          use block
-        </a>
-        。
-      </p>
-    </PageHeaderWrapper>
-  );
+  const dataSource = [
+    {
+      key: '1',
+      name: '胡彦斌',
+      age: 32,
+      address: '西湖区湖底公园1号',
+    },
+    {
+      key: '2',
+      name: 'hellokitty',
+      age: 42,
+      address: '西湖区湖底公园1号',
+    },
+  ];
+    return (<ProTable dataSource = {dataSource} columns={columns} request={(parmas)=> logMsg(parmas)}/>);
 };

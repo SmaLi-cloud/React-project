@@ -51,6 +51,30 @@ function callAPI(action, data, successCallback, errorCallback) {
     });
 }
 
+function getChildPermissions(parentKey) {
+  let allPermissions = JSON.parse(Storage.get('allPermissions'));
+  if (!parentKey) {
+    return allPermissions;
+  }
+  let childPermissions = [];
+  for (let i = 0; i < allPermissions.length; i++) {
+    if (allPermissions[i].startsWith(parentKey)) {
+      childPermissions.push(allPermissions[i]);
+    }
+  }
+  return childPermissions;
+}
+
+function checkUserPermission(permission) {
+  let userPermissions = JSON.parse(Storage.get('userPermissions'));
+  for (let i = 0; i < userPermissions.length; i++) {
+    if (userPermissions[i] == permission) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function logMsg(msg) {
   if (config.isDebug) {
     console.log(msg);
@@ -102,6 +126,7 @@ function getUrlParams() {
   }
   return obj;
 }
+
 function getComponet(typeName) {
   for (var name in window) {
     if (name == typeName) {
@@ -111,4 +136,12 @@ function getComponet(typeName) {
   return typeName;
 }
 
-export { getGuid, callAPI, logMsg, getUrlParams, getComponet };
+export {
+  getGuid,
+  callAPI,
+  logMsg,
+  getUrlParams,
+  getComponet,
+  getChildPermissions,
+  checkUserPermission,
+};

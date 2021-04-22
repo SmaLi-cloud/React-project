@@ -6,7 +6,7 @@ import Storage from '@/utils/Storage';
 import roleCheck from '@/pages/components/AdminPackage'
 import roleCheck2 from '@/pages/components/AdminPackage'
 
-import { getComponet } from '../utils/Tools'
+import { getComponet,logMsg } from '../utils/Tools'
 const RoleMap = {
     admin: {
         name: '管理员',
@@ -20,7 +20,7 @@ const RoleMap = {
 
 const opCode = Storage.get('permission')
 const admin = Storage.get('admin')
-// console.log(opCode, admin);
+// logMsg(opCode, admin);
 const tableListDataSource = [];
 const realNames = ['马巴巴', '测试', '测试2', '测试3'];
 const nickNames = ['巴巴', '测试', '测试2', '测试3'];
@@ -40,7 +40,6 @@ for (let i = 0; i < 5; i += 1) {
         index: 0
     });
 }
-
 const MemberList = () => {
     const renderRemoveUser = (text) => (<Popconfirm key="popconfirm" title={`确认${text}吗?`} okText="是" cancelText="否">
         <a>{text}</a>
@@ -53,7 +52,7 @@ const MemberList = () => {
             width: 150,
             render: (_, record) => (<>
                 {record.nickName}
-                {/* {console.log(record.nickName)} */}
+                {/* {logMsg(record.nickName)} */}
             </>),
         },
         {
@@ -92,7 +91,7 @@ const MemberList = () => {
                     arr.push(<Compant1 />, <Compant2 />, <Compant3 />)
                 }
 
-                // return [<a key="edit" onClick={() => {console.log("sss");}}>编辑</a>, <Popconfirm key="popconfirm" title={`确认吗?`} okText="是" cancelText="否" ><a>ssss</a></Popconfirm>];
+                // return [<a key="edit" onClick={() => {logMsg("sss");}}>编辑</a>, <Popconfirm key="popconfirm" title={`确认吗?`} okText="是" cancelText="否" ><a>ssss</a></Popconfirm>];
                 return arr;
 
             },
@@ -100,7 +99,7 @@ const MemberList = () => {
     ];
     return (<ProTable columns={columns} request={(params, sorter, filter) => {
         // 表单搜索项会从 params 传入，传递给后端接口。
-        // console.log(params, sorter, filter);
+        // logMsg(params, sorter, filter);
         return Promise.resolve({
             data: tableListDataSource,
             success: true,

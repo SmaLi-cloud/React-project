@@ -29,7 +29,7 @@ function roleCheck2(ChildComponent, opCode, permissions) {
       console.log("you del the button");
     }
     render() {
-      if(opCode == 'admin') {
+      if(this.state.opCode == 'admin') {
         permissions.forEach((v, i) => {
           let attribute={};
           if (v == 'del') {
@@ -55,6 +55,7 @@ function roleCheck2(ChildComponent, opCode, permissions) {
           perArr.push(<ChildComponent {...this.props} {...attribute} key={i}>{v}</ChildComponent>)
         })
       }
+      //permission "operator"
       if(opCode == "operator"){
         let attribute = {};
         permissions.forEach((v,i)=>{

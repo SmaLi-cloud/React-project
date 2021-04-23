@@ -84,14 +84,11 @@ class VoTable extends React.Component {
         if (opColsIndex >= 0) {
             let operationsCol = columns[opColsIndex];
             let attribute = {
-                key:operationsCol.key,
-                title:operationsCol.title,
-                fixed:operationsCol.fixed,
-                width:100,
+                ...operationsCol,
                 render: () => {
                     const operations = [];
                     opCols.forEach((v, i) => {
-                        operations.push(<button key={v.key} >{v.title}</button>);
+                        operations.push(<Button type="link" key={v.key} >{v.title}</Button>);
                     })
                     return operations;
                 },
@@ -193,8 +190,6 @@ class VoTable extends React.Component {
                     <Table {...this.state} pagination={pagination} />
                 </Card>
             </>
-
-
         )
     }
 }

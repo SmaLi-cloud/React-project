@@ -93,12 +93,7 @@ class VoTable extends React.Component {
                     return operations;
                 },
             }
-            // console.log(attribute);
-            // console.log(opColsIndex);
-            // console.log(columns[opColsIndex]);
-
             columns[opColsIndex] = attribute;
-            // console.log(columns[opColsIndex]);
         }
 
 

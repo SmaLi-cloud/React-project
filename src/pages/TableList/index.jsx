@@ -1,5 +1,7 @@
 import VoTable from '@/pages/components/voTable';
 import React from 'react';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+
 
 const TableList = () => {
   const dataSource = [
@@ -92,23 +94,44 @@ const TableList = () => {
       title: 'name',
       dataIndex: '',
       key: 'name',
-      type: "input",
-      colspan:1,
+      // type: 'datePicker',
+      // type: 'input',
+      type: 'select',
+      colSpan:2,
       onclick: function () {
       }
     }, {
       title: 'age',
       dataIndex: '',
       key: 'age',
-      type: 'input'
+      type: 'input',
+      colSpan:1,
     }, {
       title: 'sex',
       dataIndex: '',
       key: 'sex',
-      type: 'select'
+      type: 'select',
+      colSpan:1,
     },
   ];
-  const toolBar = ["add", "edit"];
+  const toolBar = [{
+    title:'add',
+    type: 'primary',
+    key:'add',
+    icon: <PlusOutlined />,
+    onClick: () => {
+      console.log('toolBar add click');
+    },
+  }, {
+    title: 'edit',
+    type: 'link',
+    key:'edit',
+    icon: <EditOutlined />,
+    onClick: () => {
+      console.log('toolBar edit click');
+    },
+  }];
+  // const toolBar = ['edit', 'add']
   const tableConfig = {
     searchs,
     columns,

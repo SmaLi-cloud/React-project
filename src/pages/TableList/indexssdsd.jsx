@@ -414,7 +414,9 @@ const TableList = () => {
         updateModalVisible={updateModalVisible}
         values={currentRow || {}}
       />
+<VoPermisson permission="">
 
+</VoPermisson>
       <Drawer
         width={600}
         visible={showDetail}

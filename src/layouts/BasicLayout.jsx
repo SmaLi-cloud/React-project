@@ -34,10 +34,10 @@ const menuDataRender = (menuList) =>
     };
     return Authorized.check(item.authority, localItem, null);
   });
-
 const defaultFooterDom = (
   <DefaultFooter
-    copyright={`${new Date().getFullYear()} 蚂蚁集团体验技术部出品`}
+    copyright={`${new Date().getFullYear()} 捷配物联网`}
+    copyleft={`${new Date().getFullYear()} 捷配物联网`}
     links={[
       {
         key: 'Ant Design Pro',

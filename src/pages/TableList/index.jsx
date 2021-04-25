@@ -94,9 +94,9 @@ const TableList = () => {
       title: 'name',
       dataIndex: '',
       key: 'name',
-      // type: 'datePicker',
+      type: 'datePicker',
       // type: 'input',
-      type: 'select',
+      // type: 'select',
       colSpan:2,
       onclick: function () {
       }

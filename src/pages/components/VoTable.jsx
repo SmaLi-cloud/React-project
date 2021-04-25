@@ -86,7 +86,7 @@ class VoTable extends React.Component {
                 render: () => {
                     const operations = [];
                     opCols.forEach((v, i) => {
-                        operations.push(<Button type="link" key={v.key} >{v.title}</Button>);
+                        operations.push(<Button type={v.type} key={v.key} >{v.title}</Button>);
                     })
                     return operations;
                 },

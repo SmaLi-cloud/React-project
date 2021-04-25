@@ -6,10 +6,14 @@ class VoPermisson extends React.Component {
         super(props);
     }
     render() {
-        if (Tools.checkUserPermission(this.props.permission)) {
-            return this.props.children;
+        const permissions = Tools.getChildPermissions(this.props.permission);
+        for (let i = 0; i < permissions.length; i++) {
+            if (!Tools.checkUserPermission(this.props.permission) && permissions[i] == this.props.permission) {
+                return null;
+            }
         }
-        return null;
+        return this.props.children;
     }
-};
+}
+
 export default VoPermisson;

@@ -14,7 +14,7 @@ import { useIntl, connect, FormattedMessage } from 'umi';
 import { getFakeCaptcha } from '@/services/login';
 import styles from './index.less';
 import { callAPI } from '@/utils/Tools';
-
+import { setMenuAuthority } from "@/utils/setMenuAuthority";
 
 const LoginMessage = ({ content }) => (
   <Alert
@@ -61,9 +61,10 @@ const Login = (props) => {
           },
         }}
         onFinish={(values) => {
-          // handleSubmit(values);
+          handleSubmit(values);
           callAPI('/api/login/account',{...values,type: "account"})
-          // return Promise.resolve();
+          setMenuAuthority()
+          return Promise.resolve();
         }}
       >
         <Tabs activeKey={type} onChange={setType}>

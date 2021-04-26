@@ -32,6 +32,8 @@ export default {
       },
       {
         key: '2',
+
+        
         label: '辣~',
       },
       {

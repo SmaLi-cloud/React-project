@@ -21,7 +21,6 @@ export default [
           {
             path: '/',
             component: '../layouts/BasicLayout',
-            authority: ['admin', 'user'],
             routes: [
               {
                 path: '/',
@@ -32,20 +31,19 @@ export default [
                 name: 'welcome',
                 icon: 'smile',
                 component: './Welcome',
+                // authority: ['welcome'],
               },
               {
-                path: '/admin',
                 name: 'admin',
                 icon: 'crown',
-                component: './Admin',
-                authority: ['admin'],
+                authority: ['co'],
                 routes: [
                   {
                     path: '/admin/sub-page',
                     name: 'sub-page',
                     icon: 'smile',
                     component: './Welcome',
-                    authority: ['admin'],
+                    authority: ['co.sub'],
                   },
                 ],
               },
@@ -54,6 +52,14 @@ export default [
                 icon: 'table',
                 path: '/list',
                 component: './TableList',
+                // authority:['co.list']
+              },
+              {
+                name: 'list.table-list',
+                icon: 'table',
+                path: '/connect',
+                component: './connect.jsx',
+                // authority:['co.list']
               },
               {
                 component: './404',

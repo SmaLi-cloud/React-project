@@ -1,7 +1,7 @@
 const timeout = 5000;
 const prefix = 'http://localhost:8000';
 const isDebug = true;
-const authority = ["co", "co.list", "welcom", "manage.page", "manage.page"];
+const authority = ["co", "co.user", "co.staff", "welcome"];
 
 const config = {
     timeout,

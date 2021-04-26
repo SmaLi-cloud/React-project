@@ -1,5 +1,6 @@
 import config from './config';
 import Storage from './Storage';
+import { message } from 'antd';
 import request from 'umi-request';
 
 /**
@@ -35,8 +36,12 @@ function callAPI(action, data, successCallback, errorCallback) {
   };
   request(action, options)
     .then((result) => {
+      console.log(result);
+      message.success('🎉 🎉 🎉  登录成功！');
+
+      // window.location.href = "http://localhost:8000/formList"
       if (action !== 'api/login/count' && !result.needLogin) {
-        const url = encodeURIComponent(window.location.href);
+        // const url = encodeURIComponent(window.location.href);
         // window.location.href ='/user/login?redirect='+url;
       }
       if (successCallback) {
@@ -52,7 +57,10 @@ function callAPI(action, data, successCallback, errorCallback) {
 }
 
 function getChildPermissions(parentKey) {
-  let allPermissions = JSON.parse(Storage.get('allPermissions'));
+  let allPermissions =[];
+  if(Storage.get('allPermissions')){
+    allPermissions = JSON.parse(Storage.get('allPermissions'));
+  }
   if (!parentKey) {
     return allPermissions;
   }

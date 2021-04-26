@@ -37,26 +37,13 @@ const menuDataRender = (menuList) =>
 const defaultFooterDom = (
   <DefaultFooter
     copyright={`${new Date().getFullYear()} 捷配物联网`}
-    copyleft={`${new Date().getFullYear()} 捷配物联网`}
     links={[
-      {
-        key: 'Ant Design Pro',
-        title: 'Ant Design Pro',
-        href: 'https://pro.ant.design',
-        blankTarget: true,
-      },
       {
         key: 'github',
         title: <GithubOutlined />,
-        href: 'https://github.com/ant-design/ant-design-pro',
+        href: 'https://github.com/SmaLi-cloud/React-project',
         blankTarget: true,
-      },
-      {
-        key: 'Ant Design',
-        title: 'Ant Design',
-        href: 'https://ant.design',
-        blankTarget: true,
-      },
+      }
     ]}
   />
 );

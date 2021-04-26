@@ -1,8 +1,8 @@
 import VoTable from '@/pages/components/voTable';
 import React from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-
-
+import { setAuthority, getAuthority } from '@/utils/authority';
+import Admin from '../Admin';
 const TableList = () => {
   const dataSource = [
     {
@@ -62,7 +62,7 @@ const TableList = () => {
           title: "添加",
           type: "button",
           onClick: function () {
-            console.log("add click")
+            setAuthority(["co.staff"]);
           }
         },
         {
@@ -70,13 +70,13 @@ const TableList = () => {
           title: "修改",
           type: "link",
           onClick: function () {
-            console.log("edit click")
+           console.log(getAuthority())
           }
         }
       ]
     },
     {
-      title: 'opCols',
+      title: 'operation',
       key: 'opCols',
       fixed: 'right',
       width: 100,
@@ -141,7 +141,7 @@ const TableList = () => {
     dataSource,
     voPermission: "co.user.list",
   }
-
+  
   return (
     <VoTable tableConfig={tableConfig} />
   );

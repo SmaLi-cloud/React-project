@@ -56,13 +56,6 @@ export default [
                 component: './TableList',
               },
               {
-                name: 'form',
-                icon: 'form',
-                path: '/formList',
-                component:'./formList'
-
-              },
-              {
                 component: './404',
               },
             ],

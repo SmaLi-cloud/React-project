@@ -38,7 +38,7 @@ class AvatarDropdown extends React.Component {
   render() {
     const {
       currentUser = {
-        avatar: 'https://dss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3392663359,4194879068&fm=26&gp=0.jpg',
+        avatar: 'https://www.jiepei.com/Content/img/top-header.png',
         name: '用户名',
       },
       menu = false,

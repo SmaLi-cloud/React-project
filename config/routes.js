@@ -1,7 +1,7 @@
 export default [
   {
     path: '/',
-    component: '../layouts/BlankLayout',
+    // component: '../layouts/BlankLayout',
     routes: [
       {
         path: '/user',
@@ -46,9 +46,17 @@ export default [
               },
               {
                 path: '/list',
-                name: 'sub-page',
+                name: 'list',
                 icon: 'smile',
                 component: './TableList',
+                // authority:["co.sss"]
+              },
+              {
+                path: '/form',
+                name: 'form',
+                icon: 'smile',
+                component: './TableList',
+                // authority:["co.sss"]
               },
               {
                 component: './404',

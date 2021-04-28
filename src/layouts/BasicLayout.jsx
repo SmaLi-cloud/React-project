@@ -8,7 +8,7 @@ import React, { useMemo, useRef } from 'react';
 import { Link, useIntl, history } from 'umi';
 import { GithubOutlined } from '@ant-design/icons';
 import { Result, Button } from 'antd';
-import Authorized from '@/utils/Authorized';
+import { Authorized } from '@/utils/setMenuAuthority';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { getMatchMenu } from '@umijs/route-utils';
 import logo from '../assets/logo.svg';

@@ -1,7 +1,6 @@
 import VoTable from '@/pages/components/voTable';
 import React from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { setAuthority, getAuthority } from '@/utils/authority';
 
 const TableList = () => {
   const dataSource = [
@@ -70,7 +69,6 @@ const TableList = () => {
           title: "修改",
           type: "link",
           onClick: function () {
-           console.log(getAuthority())
           }
         }
       ]

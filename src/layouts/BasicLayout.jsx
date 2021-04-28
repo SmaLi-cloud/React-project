@@ -84,9 +84,7 @@ const BasicLayout = (props) => {
         }
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
-
       footerRender={() => defaultFooterDom }
-
       menuDataRender={menuDataRender}
       rightContentRender={() => <RightContent />}
       postMenuData={(menuData) => {

@@ -1,30 +1,18 @@
-import { DefaultFooter, getMenuData, getPageTitle } from '@ant-design/pro-layout';
+import { DefaultFooter, getPageTitle } from '@ant-design/pro-layout';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { SelectLang, useIntl, connect, FormattedMessage } from 'umi';
+import { SelectLang, useIntl, FormattedMessage } from 'umi';
+import { GithubOutlined } from '@ant-design/icons'
 import React from 'react';
 import logo from '../assets/logo.png';
 import styles from './UserLayout.less';
+import Login from '@/pages/User/login'
 
-const UserLayout = (props) => {
-  const {
-    route = {
-      routes: [],
-    },
-  } = props;
-  const { routes = [] } = route;
-  const {
-    children,
-    location = {
-      pathname: '',
-    },
-  } = props;
+const UserLayout = () => {
+
   const { formatMessage } = useIntl();
-  const { breadcrumb } = getMenuData(routes);
   const title = getPageTitle({
     pathname: location.pathname,
     formatMessage,
-    breadcrumb,
-    ...props,
   });
   return (
     <HelmetProvider>
@@ -40,8 +28,8 @@ const UserLayout = (props) => {
         <div className={styles.content}>
           <div className={styles.top}>
             <div className={styles.header}>
-                <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>物联网管理平台</span>
+              <img alt="logo" className={styles.logo} src={logo} />
+              <span className={styles.title}>物联网管理平台</span>
             </div>
             <div className={styles.desc}>
               <FormattedMessage
@@ -50,12 +38,20 @@ const UserLayout = (props) => {
               />
             </div>
           </div>
-          {children}
+          <Login />
         </div>
-        <DefaultFooter />
+        <DefaultFooter
+          copyright={`${new Date().getFullYear()} 捷配物联网`}
+          links={[
+            {
+              key: 'github',
+              title: <GithubOutlined />,
+            }
+          ]}
+        />
       </div>
     </HelmetProvider>
   );
 };
 
-export default connect(({ settings }) => ({ ...settings }))(UserLayout);
+export default UserLayout

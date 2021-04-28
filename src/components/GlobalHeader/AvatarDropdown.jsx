@@ -1,23 +1,34 @@
+import * as Tools from '@/utils/Tools';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Menu, Spin } from 'antd';
+import { Avatar, Menu, Spin, Dropdown } from 'antd';
 import React from 'react';
-import { history, connect } from 'umi';
-import HeaderDropdown from '../HeaderDropdown';
+import { history } from 'umi';
 import styles from './index.less';
+import { stringify } from 'querystring';
+import classNames from 'classnames';
+
+const HeaderDropdown = ({ overlayClassName: cls, ...restProps }) => (
+  <Dropdown overlayClassName={classNames(styles.container, cls)} {...restProps} />
+);
 
 class AvatarDropdown extends React.Component {
+  logout() {
+    const { redirect } = Tools.getPageQuery(); // Note: There may be security issues, please note
+    if (window.location.pathname !== '/user/login' && !redirect) {
+      history.replace({
+        pathname: '/user/login',
+        search: stringify({
+          redirect: window.location.href,
+        }),
+      });
+    }
+  }
+
   onMenuClick = (event) => {
     const { key } = event;
-
+    Tools.logMsg(event)
     if (key === 'logout') {
-      const { dispatch } = this.props;
-
-      if (dispatch) {
-        dispatch({
-          type: 'login/logout',
-        });
-      }
-
+      this.logout()
       return;
     }
 
@@ -27,10 +38,10 @@ class AvatarDropdown extends React.Component {
   render() {
     const {
       currentUser = {
-        avatar: '',
-        name: '',
+        avatar: 'https://dss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3392663359,4194879068&fm=26&gp=0.jpg',
+        name: '用户名',
       },
-      menu,
+      menu = false,
     } = this.props;
     const menuHeaderDropdown = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
@@ -75,6 +86,4 @@ class AvatarDropdown extends React.Component {
   }
 }
 
-export default connect(({ user }) => ({
-  currentUser: user.currentUser,
-}))(AvatarDropdown);
+export default AvatarDropdown

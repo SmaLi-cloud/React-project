@@ -17,7 +17,7 @@ export const isAntDesignProOrDev = () => {
   if (NODE_ENV === 'development') {
     return true;
   }
-
   return isAntDesignPro();
+  
 };
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);

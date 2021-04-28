@@ -9,7 +9,6 @@ let Authorized = RenderAuthorize(getAuthority()); // Reload the rights component
 const reloadAuthorized = () => {
   Authorized = RenderAuthorize(getAuthority());
 };
-/** Hard code block need it。 */
 
 window.reloadAuthorized = reloadAuthorized;
 export { reloadAuthorized };

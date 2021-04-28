@@ -2,7 +2,7 @@ import VoTable from '@/pages/components/voTable';
 import React from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { setAuthority, getAuthority } from '@/utils/authority';
-import Admin from '../Admin';
+
 const TableList = () => {
   const dataSource = [
     {

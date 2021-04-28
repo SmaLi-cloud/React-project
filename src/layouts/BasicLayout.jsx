@@ -4,8 +4,8 @@
  * @see You can view component api by: https://github.com/ant-design/ant-design-pro-layout
  */
 import ProLayout, { DefaultFooter } from '@ant-design/pro-layout';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Link, useIntl, connect, history } from 'umi';
+import React, { useMemo, useRef } from 'react';
+import { Link, useIntl, history } from 'umi';
 import { GithubOutlined } from '@ant-design/icons';
 import { Result, Button } from 'antd';
 import Authorized from '@/utils/Authorized';
@@ -50,7 +50,6 @@ const defaultFooterDom = (
 
 const BasicLayout = (props) => {
   const {
-    dispatch,
     children,
     settings,
     location = {
@@ -58,23 +57,6 @@ const BasicLayout = (props) => {
     },
   } = props;
   const menuDataRef = useRef([]);
-  useEffect(() => {
-    if (dispatch) {
-      dispatch({
-        type: 'user/fetchCurrent',
-      });
-    }
-  }, []);
-  /** Init variables */
-
-  const handleMenuCollapse = (payload) => {
-    if (dispatch) {
-      dispatch({
-        type: 'global/changeLayoutCollapsed',
-        payload,
-      });
-    }
-  }; // get children authority
 
   const authorized = useMemo(
     () =>
@@ -83,6 +65,7 @@ const BasicLayout = (props) => {
       },
     [location.pathname],
   );
+
   const { formatMessage } = useIntl();
   return (
     <ProLayout
@@ -90,7 +73,6 @@ const BasicLayout = (props) => {
       formatMessage={formatMessage}
       {...props}
       {...settings}
-      onCollapse={handleMenuCollapse}
       onMenuHeaderClick={() => history.push('/')}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (
@@ -100,42 +82,16 @@ const BasicLayout = (props) => {
         ) {
           return defaultDom;
         }
-
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;
       }}
-      breadcrumbRender={(routers = []) => [
-        {
-          path: '/',
-          breadcrumbName: formatMessage({
-            id: 'menu.home',
-          }),
-        },
-        ...routers,
-      ]}
-      itemRender={(route, params, routes, paths) => {
-        const first = routes.indexOf(route) === 0;
-        return first ? (
-          <Link to={paths.join('/')}>{route.breadcrumbName}</Link>
-        ) : (
-          <span>{route.breadcrumbName}</span>
-        );
-      }}
-      footerRender={() => {
-        if (settings.footerRender || settings.footerRender === undefined) {
-          return defaultFooterDom;
-        }
 
-        return null;
-      }}
+      footerRender={() => defaultFooterDom }
+
       menuDataRender={menuDataRender}
       rightContentRender={() => <RightContent />}
       postMenuData={(menuData) => {
         menuDataRef.current = menuData || [];
         return menuData || [];
-      }}
-      waterMarkProps={{
-        content: 'Ant Design Pro',
-        fontColor: 'rgba(24,144,255,0.15)',
       }}
     >
       <Authorized authority={authorized.authority} noMatch={noMatch}>
@@ -145,7 +101,4 @@ const BasicLayout = (props) => {
   );
 };
 
-export default connect(({ global, settings }) => ({
-  collapsed: global.collapsed,
-  settings,
-}))(BasicLayout);
+export default BasicLayout;

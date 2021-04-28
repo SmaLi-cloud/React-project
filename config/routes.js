@@ -16,7 +16,6 @@ export default [
       },
       {
         path: '/',
-        component: '../layouts/SecurityLayout',
         routes: [
           {
             path: '/',
@@ -31,35 +30,25 @@ export default [
                 name: 'welcome',
                 icon: 'smile',
                 component: './Welcome',
-                // authority: ['welcome'],
               },
               {
+                path: '/admin',
                 name: 'admin',
                 icon: 'crown',
-                authority: ['co'],
                 routes: [
                   {
                     path: '/admin/sub-page',
                     name: 'sub-page',
                     icon: 'smile',
-                    component: './Welcome',
-                    authority: ['co.sub'],
+                    component: './404',
                   },
                 ],
               },
               {
-                name: 'list.table-list',
-                icon: 'table',
                 path: '/list',
+                name: 'sub-page',
+                icon: 'smile',
                 component: './TableList',
-                // authority:['co.list']
-              },
-              {
-                name: 'list.table-list',
-                icon: 'table',
-                path: '/connect',
-                component: './connect.jsx',
-                // authority:['co.list']
               },
               {
                 component: './404',

@@ -70,7 +70,9 @@ const GlobalHeaderRight = (props) => {
   );
 };
 
-export default connect(({ settings }) => ({
-  theme: settings.navTheme,
-  layout: settings.layout,
-}))(GlobalHeaderRight);
+// export default connect(({ settings }) => ({
+//   theme: settings.navTheme,
+//   layout: settings.layout,
+// }))(GlobalHeaderRight);
+
+export default  GlobalHeaderRight

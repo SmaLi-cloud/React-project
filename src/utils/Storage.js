@@ -5,7 +5,10 @@ function get(key) {
 }
 
 function set(key, value) {
-  return sessionStorage ? sessionStorage.setItem(key, value) : Cookies.set(key, value);
+  if (value instanceof Array) {
+    value = JSON.stringify(value);
+  }
+  return sessionStorage ?  sessionStorage.setItem(key, value) : Cookies.set(key, value);
 }
 
 function remove(key) {

@@ -1,6 +1,7 @@
 import config from './config';
 import Storage from './Storage';
 import { message } from 'antd';
+import { parse } from 'querystring';
 import request from 'umi-request';
 
 /**
@@ -21,31 +22,33 @@ function getGuid() {
  */
 function callAPI(action, data, successCallback, errorCallback) {
   const token = Storage.get('VO_TOKEN');
-  const headers = {
+  let headers = {
     'Request-Unid': getGuid(),
-    Accept: 'application/json',
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Vo-Token': token,
+    'Content-Type': 'application/json',
   };
+  if (token) {
+    headers['Vo-Token'] = token;
+  }
+  data['action'] = action;
   const options = {
-    prefix: config.prefix,
     method: 'POST',
     data: humpToLine(data),
     timeout: config.timeout,
-    headers,
+    headers: headers,
+    mode: 'cors',
   };
-  request(action, options)
+  request(config.prefix, options)
     .then((result) => {
       console.log(result);
-      message.success('🎉 🎉 🎉  登录成功！');
+      const { success, data } = result;
 
       // window.location.href = "http://localhost:8000/formList"
-      if (action !== 'api/login/count' && !result.needLogin) {
-        // const url = encodeURIComponent(window.location.href);
-        // window.location.href ='/user/login?redirect='+url;
-      }
-      if (successCallback) {
-        successCallback(lineToHump(result));
+      // if (action !== 'api/login/count' && !result.needLogin) {
+      // const url = encodeURIComponent(window.location.href);
+      // window.location.href ='/user/login?redirect='+url;
+      // }
+      if (successCallback && success) {
+        successCallback(lineToHump(data));
       }
     })
     .catch((err) => {
@@ -57,8 +60,8 @@ function callAPI(action, data, successCallback, errorCallback) {
 }
 
 function getChildPermissions(parentKey) {
-  let allPermissions =[];
-  if(Storage.get('allPermissions')){
+  let allPermissions = [];
+  if (Storage.get('allPermissions')) {
     allPermissions = JSON.parse(Storage.get('allPermissions'));
   }
   if (!parentKey) {
@@ -144,6 +147,8 @@ function getComponet(typeName) {
   return typeName;
 }
 
+const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
 export {
   getGuid,
   callAPI,
@@ -152,4 +157,5 @@ export {
   getComponet,
   getChildPermissions,
   checkUserPermission,
+  getPageQuery,
 };

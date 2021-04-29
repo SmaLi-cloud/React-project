@@ -5,7 +5,7 @@ import { GithubOutlined } from '@ant-design/icons'
 import React from 'react';
 import logo from '../assets/logo.png';
 import styles from './UserLayout.less';
-import Login from '@/pages/User/login'
+import Login from '@/pages/user/login'
 
 const UserLayout = () => {
 

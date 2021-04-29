@@ -10,7 +10,7 @@ export default [
           {
             name: 'login',
             path: '/user/login',
-            component: './User/login',
+            component: './user/login',
           },
         ],
       },
@@ -23,13 +23,13 @@ export default [
             routes: [
               {
                 path: '/',
-                redirect: '/welcome',
+                redirect: '/home',
               },
               {
-                path: '/welcome',
-                name: 'welcome',
-                icon: 'smile',
-                component: './Welcome',
+                path: '/home',
+                name: 'home',
+                icon: 'home',
+                component: './home',
               },
               {
                 path: '/admin',
@@ -40,7 +40,7 @@ export default [
                     path: '/admin/sub-page',
                     name: 'sub-page',
                     icon: 'smile',
-                    component: './404',
+                    component: './Admin',
                   },
                 ],
               },
@@ -48,14 +48,14 @@ export default [
                 path: '/list',
                 name: 'list',
                 icon: 'smile',
-                component: './TableList',
+                component: './tableList',
                 // authority:["co.sss"]
               },
               {
                 path: '/form',
                 name: 'form',
                 icon: 'smile',
-                component: './TableList',
+                component: './treeList',
                 // authority:["co.sss"]
               },
               {

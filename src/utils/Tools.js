@@ -1,6 +1,5 @@
 import config from './config';
 import Storage from './Storage';
-import { message } from 'antd';
 import { parse } from 'querystring';
 import request from 'umi-request';
 
@@ -21,7 +20,7 @@ function getGuid() {
  * @param { Object,Array } data
  */
 function callAPI(action, data, successCallback, errorCallback) {
-  const token = Storage.get('VO_TOKEN');
+  const token = Storage.get('voToken');
   let headers = {
     'Request-Unid': getGuid(),
     'Content-Type': 'application/json',
@@ -40,15 +39,15 @@ function callAPI(action, data, successCallback, errorCallback) {
   request(config.prefix, options)
     .then((result) => {
       console.log(result);
-      const { success, data } = result;
+      const { success } = result;
 
       // window.location.href = "http://localhost:8000/formList"
       // if (action !== 'api/login/count' && !result.needLogin) {
       // const url = encodeURIComponent(window.location.href);
       // window.location.href ='/user/login?redirect='+url;
       // }
-      if (successCallback && success) {
-        successCallback(lineToHump(data));
+      if (successCallback) {
+        successCallback(lineToHump(result));
       }
     })
     .catch((err) => {
@@ -147,6 +146,53 @@ function getComponet(typeName) {
   return typeName;
 }
 
+function buildTree(data, key_filed, parent_filed, child_filed, parent_id) {
+  let tree = [];
+  for (let i = 0; i < data.length; i++) {
+    data[i]["title"] = data[i]["name"];
+    data[i]["value"] = data[i]["id"];
+      if (data[i][parent_filed] == parent_id) {
+          let childrens = buildTree(data, key_filed, parent_filed, child_filed, data[i][key_filed]);
+          if (childrens.length) {
+              data[i][child_filed] = childrens;
+          }
+          tree.push(data[i]);
+      }
+  }
+  return tree;
+}
+
+function getTreeParent(tree, child_filed, parent_id, key_filed, child_id) {
+  let parents = [];
+  for (let i = 0; i < tree.length; i++) {
+      if (tree[i][child_filed]) {
+          let child_parents = getTreeParent(
+            tree[i][child_filed],
+            child_filed,
+            parent_id,
+            key_filed,
+            child_id
+          );
+          if (child_parents !== false) {
+            parents.push(tree[i][key_filed]);
+            for (let j = 0; j < child_parents.length; j++) {
+              parents.push(child_parents[j]);
+            }
+            return parents;
+          }
+        }
+     else {
+      if (tree[i][key_filed] == child_id) {
+          if(!tree[i][parent_id]){
+            return false
+          }
+          return parents;
+        }
+    }
+  }
+  return false;
+}
+
 const getPageQuery = () => parse(window.location.href.split('?')[1]);
 
 export {
@@ -158,4 +204,6 @@ export {
   getChildPermissions,
   checkUserPermission,
   getPageQuery,
+  buildTree,
+  getTreeParent
 };

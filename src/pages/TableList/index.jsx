@@ -1,8 +1,8 @@
-import VoTable from '@/pages/components/voTable';
+import VoTable from '@/pages/components/VoTable';
 import React from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
-const TableList = () => {
+const tableList = () => {
   const dataSource = [
     {
       key: '1',
@@ -145,4 +145,4 @@ const TableList = () => {
   );
 };
 
-export default TableList;
+export default tableList;

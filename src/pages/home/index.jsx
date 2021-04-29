@@ -6,7 +6,7 @@ import Storage from '@/utils/Storage';
 import roleCheck from '@/pages/components/AdminPackage'
 import roleCheck2 from '@/pages/components/AdminPackage'
 
-import { getComponet,logMsg } from '../utils/Tools'
+import { getComponet,logMsg } from '../../utils/Tools'
 const RoleMap = {
     admin: {
         name: '管理员',

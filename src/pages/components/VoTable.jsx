@@ -1,6 +1,6 @@
 import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select } from 'antd';
 import React from 'react';
-import { SearchOutlined, RedoOutlined, PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/Tools';
 import styles from './VoTable.less'
 
@@ -206,4 +206,5 @@ class VoTable extends React.Component {
         )
     }
 }
+
 export default VoTable

@@ -4,7 +4,7 @@ import {
     MobileOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import { Alert, message, Tabs } from 'antd';
+import { Alert, message, Tabs, Input, Row, Col } from 'antd';
 import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
@@ -26,7 +26,7 @@ const LoginMessage = ({ content }) => (
 
 const Login = () => {
     const successCallback = (result) => {
-        const data = result;
+        const {data} = result;
         Storage.set('voToken', data.voToken)
         Storage.set('staffId', data.staffId)
         Storage.set('allPermissions', data.allPermissions)
@@ -48,7 +48,7 @@ const Login = () => {
 
     const errorCallback = (result) => {
         Tools.logMsg(result)
-        const data = result;
+        const {data} = result;
         setSubmit(false)
         setMsg(data.msg)
     }
@@ -95,13 +95,13 @@ const Login = () => {
                             defaultMessage: '账户密码登录',
                         })}
                     />
-                    {/* <Tabs.TabPane
+                    <Tabs.TabPane
               key="mobile"
               tab={intl.formatMessage({
                 id: 'pages.login.phoneLogin.tab',
                 defaultMessage: '手机号登录',
               })}
-            /> */}
+            />
                 </Tabs>
                 {
                     msg && (
@@ -164,6 +164,14 @@ const Login = () => {
                                 },
                             ]}
                         />
+                        <Row className={styles.antRow}>
+                            <Col span="18">
+                                <Input className={styles.antdInput} placeholder="输入验证码"/>
+                            </Col>
+                            <Col span="6" className={styles.bacimg}>
+                                  <img  src="" alt=""/>
+                            </Col>
+                        </Row>
                     </>
                 )}
 
@@ -223,10 +231,7 @@ const Login = () => {
                                     })}`;
                                 }
 
-                                return intl.formatMessage({
-                                    id: 'pages.login.phoneLogin.getVerificationCode',
-                                    defaultMessage: '获取验证码',
-                                });
+                                return  <img src="https://img1.baidu.com/it/u=2496571732,442429806&fm=26&fmt=auto&gp=0.jpg" alt="" className={styles.antBtnLg}/>
                             }}
                             name="captcha"
                             rules={[

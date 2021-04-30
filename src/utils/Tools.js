@@ -38,7 +38,7 @@ function callAPI(action, data, successCallback, errorCallback) {
   };
   request(config.prefix, options)
     .then((result) => {
-      console.log(result);
+      // console.log(result);
       const { success } = result;
 
       // window.location.href = "http://localhost:8000/formList"

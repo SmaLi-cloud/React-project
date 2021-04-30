@@ -5,7 +5,6 @@ import * as Tools from '@/utils/Tools';
 import styles from './VoTable.less'
 
 class VoTable extends React.Component {
-
     constructor(props) {
         super(props);
         let columns = this.props.tableConfig.columns;
@@ -54,7 +53,6 @@ class VoTable extends React.Component {
 
             }
         }
-
         let opIndex = this.getObjIndex(columns, 'key', 'operations');
         if (opIndex >= 0) {
             let operationsCol = columns[opIndex];
@@ -92,15 +90,25 @@ class VoTable extends React.Component {
             }
             columns[opColsIndex] = attribute;
         }
-
-
         this.state = {
             columns: columns,
-            dataSource: this.props.tableConfig.dataSource,
-            selectedRowKeys: []
+            selectedRowKeys: [],
+            dataSource: []
         };
         this.searchs = searchs;
         this.toolBar = toolBar;
+        this.pagination = {
+            position: ['bottomRight'],
+            size: "small",
+            showSizeChanger: true,
+            showQuickJumper: true,
+            ...this.props.tableConfig.paging
+        }
+        this.formRef = React.createRef();
+
+    }
+    CompnentDidMount() {
+        Tools.callAPI(this.props.tableConfig.dataAction, { "conditions": {} }, this.successCallBack);
     }
 
     getObjIndex(objList, attribute, value) {
@@ -150,39 +158,28 @@ class VoTable extends React.Component {
         }
         return children.length > 0 ? children : null;
     };
-
+    successCallBack = (result) => {
+        this.setState({ dataSource: result.data.rows });
+    }
     onSelectChange = (selectedRowKeys, selectRows) => {
         Tools.logMsg(selectRows);
         this.setState({ selectedRowKeys });
     };
-
+    onReset = () => {
+        this.formRef.current.resetFields();
+    };
+    onFinish = (values) => {
+        Tools.logMsg(values);
+    };
     render() {
-        const rowSelection = {
-            selectedRowKeys: this.state.selectedRowKeys,
-            onChange: this.onSelectChange,
-        };
-        const pagination = {
-            position: ['bottomRight'],
-            size: "small",
-            showSizeChanger: true,
-            showQuickJumper: true,
-            ...this.props.tableConfig.paging
-        }
-        const onReset = () => {
-            formRef.current.resetFields();
-        };
-        const formRef = React.createRef();
 
-        const onFinish = (values) => {
-            Tools.logMsg(values);
-        };
         return (
             <>
                 {
                     !this.getFields() ? null : <Card style={{ marginBottom: 10 }}>
                         <Form
-                            onFinish={onFinish}
-                            ref={formRef}
+                            onFinish={this.onFinish}
+                            ref={this.formRef}
                         >
                             <Row gutter={24}>{this.getFields()}</Row>
                             {this.state.columns.length == 0 ? null :
@@ -200,7 +197,7 @@ class VoTable extends React.Component {
                         {this.getToolBar()}
                     </Space>
                     <Button type="link" className={styles.refresh} icon={<RedoOutlined />}></Button>
-                    <Table {...this.state} pagination={pagination} rowSelection={rowSelection} />
+                    <Table {...this.props.tableConfig.otherConfig} {...this.state} pagination={this.pagination} rowSelection={this.rowSelection} />
                 </Card>
             </>
         )

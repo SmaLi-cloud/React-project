@@ -1,23 +1,11 @@
 import VoTable from '@/pages/components/VoTable';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import * as Tools from '@/utils/Tools';
 
 const tableList = () => {
-  const dataSource = [
-    {
-      key: '1',
-      name: '胡彦斌',
-      age: 32,
-      address: '西湖区湖底公园1号',
-    },
-    {
-      key: '2',
-      name: 'hellokitty',
-      age: 42,
-      address: '西湖区湖底公园1号',
-    },
-  ];
-  const opCols= [
+
+  const opCols = [
     {
       key: 'add',
       title: "添加",
@@ -42,14 +30,14 @@ const tableList = () => {
       key: 'name',
     },
     {
-      title: 'age',
-      dataIndex: 'age',
-      key: 'age',
+      title: 'code',
+      dataIndex: 'code',
+      key: 'code',
     },
     {
-      title: 'address',
-      dataIndex: 'address',
-      key: 'address',
+      title: 'level',
+      dataIndex: 'level',
+      key: 'level',
     },
     {
       title: 'operations',
@@ -95,7 +83,7 @@ const tableList = () => {
       type: 'datePicker',
       // type: 'input',
       // type: 'select',
-      colSpan:2,
+      colSpan: 2,
       onclick: function () {
       }
     }, {
@@ -103,19 +91,20 @@ const tableList = () => {
       dataIndex: '',
       key: 'age',
       type: 'input',
-      colSpan:1,
+      colSpan: 1,
     }, {
       title: 'sex',
       dataIndex: '',
       key: 'sex',
       type: 'select',
-      colSpan:1,
+      colSpan: 1,
     },
   ];
+
   const toolBar = [{
-    title:'add',
+    title: 'add',
     type: 'primary',
-    key:'add',
+    key: 'add',
     icon: <PlusOutlined />,
     onClick: () => {
       console.log('toolBar add click');
@@ -123,25 +112,26 @@ const tableList = () => {
   }, {
     title: 'edit',
     type: 'link',
-    key:'edit',
+    key: 'edit',
     icon: <EditOutlined />,
     onClick: () => {
       console.log('toolBar edit click');
     },
   }];
-  // const toolBar = ['edit', 'add']
+
   const tableConfig = {
     searchs,
     columns,
     opCols,
     toolBar,
     paging,
-    dataSource,
-    voPermission: "co.user.list",
-  }
-  
+    dataAction: 'sys.permission:search',
+    otherConfig: { rowKey: "id" },
+    // voPermission: "sys",
+  };
+
   return (
-    <VoTable tableConfig={tableConfig} />
+    <VoTable tableConfig={tableConfig}  />
   );
 };
 

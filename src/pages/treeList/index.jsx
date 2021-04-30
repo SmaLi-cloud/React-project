@@ -42,7 +42,7 @@ class Demo extends React.Component {
     Tools.logMsg(result)
   }
   componentDidMount() {
-    Tools.callAPI('sys.permission:search', { "conditions": { "name": "" } }, this.successCallBack, this.errorCallBack)
+    Tools.callAPI('sys.permission:search', { "conditions": {} }, this.successCallBack, this.errorCallBack)
   }
   render() {
     const tProps = {

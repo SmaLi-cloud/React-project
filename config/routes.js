@@ -23,40 +23,21 @@ export default [
             routes: [
               {
                 path: '/',
-                redirect: '/home',
+                redirect: '/login',
               },
               {
-                path: '/home',
-                name: 'home',
-                icon: 'home',
-                component: './home',
-              },
-              {
-                path: '/admin',
-                name: 'admin',
+                name: 'sys',
                 icon: 'crown',
+                authority:['sys'],
                 routes: [
                   {
-                    path: '/admin/sub-page',
-                    name: 'sub-page',
+                    path: '/sys/permission',
+                    name: 'permission',
                     icon: 'smile',
-                    component: './Admin',
+                    component: './sys/permission',
+                    authority:['sys.permission'],
                   },
                 ],
-              },
-              {
-                path: '/list',
-                name: 'list',
-                icon: 'smile',
-                component: './tableList',
-                // authority:["co.sss"]
-              },
-              {
-                path: '/form',
-                name: 'form',
-                icon: 'smile',
-                component: './treeList',
-                // authority:["co.sss"]
               },
               {
                 component: './404',

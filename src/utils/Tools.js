@@ -38,7 +38,7 @@ function callAPI(action, data, successCallback, errorCallback) {
   };
   request(config.prefix, options)
     .then((result) => {
-      // console.log(result);
+      console.log(result);
       const { success } = result;
 
       // window.location.href = "http://localhost:8000/formList"
@@ -76,13 +76,22 @@ function getChildPermissions(parentKey) {
 }
 
 function checkUserPermission(permission) {
-  let userPermissions = JSON.parse(Storage.get('userPermissions'));
-  for (let i = 0; i < userPermissions.length; i++) {
-    if (userPermissions[i] == permission) {
-      return true;
+  let allPermissions = [];
+  if (Storage.get('allPermissions')) {
+    allPermissions = JSON.parse(Storage.get('allPermissions'));
+  }
+  for (let i = 0; i < allPermissions.length; i++) {
+    if (allPermissions[i] == permission) {
+      let userPermissions = JSON.parse(Storage.get('userPermissions'));
+      for (let i = 0; i < userPermissions.length; i++) {
+        if (userPermissions[i] == permission) {
+          return true;
+        }
+      }
+      return false;
     }
   }
-  return false;
+  return true;
 }
 
 function logMsg(msg) {
@@ -149,15 +158,15 @@ function getComponet(typeName) {
 function buildTree(data, key_filed, parent_filed, child_filed, parent_id) {
   let tree = [];
   for (let i = 0; i < data.length; i++) {
-    data[i]["title"] = data[i]["name"];
-    data[i]["value"] = data[i]["id"];
-      if (data[i][parent_filed] == parent_id) {
-          let childrens = buildTree(data, key_filed, parent_filed, child_filed, data[i][key_filed]);
-          if (childrens.length) {
-              data[i][child_filed] = childrens;
-          }
-          tree.push(data[i]);
+    data[i]['title'] = data[i]['name'];
+    data[i]['value'] = data[i]['id'];
+    if (data[i][parent_filed] == parent_id) {
+      let childrens = buildTree(data, key_filed, parent_filed, child_filed, data[i][key_filed]);
+      if (childrens.length) {
+        data[i][child_filed] = childrens;
       }
+      tree.push(data[i]);
+    }
   }
   return tree;
 }
@@ -165,29 +174,28 @@ function buildTree(data, key_filed, parent_filed, child_filed, parent_id) {
 function getTreeParent(tree, child_filed, parent_id, key_filed, child_id) {
   let parents = [];
   for (let i = 0; i < tree.length; i++) {
-      if (tree[i][child_filed]) {
-          let child_parents = getTreeParent(
-            tree[i][child_filed],
-            child_filed,
-            parent_id,
-            key_filed,
-            child_id
-          );
-          if (child_parents !== false) {
-            parents.push(tree[i][key_filed]);
-            for (let j = 0; j < child_parents.length; j++) {
-              parents.push(child_parents[j]);
-            }
-            return parents;
-          }
+    if (tree[i][child_filed]) {
+      let child_parents = getTreeParent(
+        tree[i][child_filed],
+        child_filed,
+        parent_id,
+        key_filed,
+        child_id,
+      );
+      if (child_parents !== false) {
+        parents.push(tree[i][key_filed]);
+        for (let j = 0; j < child_parents.length; j++) {
+          parents.push(child_parents[j]);
         }
-     else {
+        return parents;
+      }
+    } else {
       if (tree[i][key_filed] == child_id) {
-          if(!tree[i][parent_id]){
-            return false
-          }
-          return parents;
+        if (!tree[i][parent_id]) {
+          return false;
         }
+        return parents;
+      }
     }
   }
   return false;
@@ -205,5 +213,5 @@ export {
   checkUserPermission,
   getPageQuery,
   buildTree,
-  getTreeParent
+  getTreeParent,
 };

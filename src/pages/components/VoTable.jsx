@@ -1,4 +1,4 @@
-import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select } from 'antd';
+import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Modal, TreeSelect } from 'antd';
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/Tools';
@@ -7,110 +7,167 @@ import styles from './VoTable.less'
 class VoTable extends React.Component {
     constructor(props) {
         super(props);
-        let columns = this.props.tableConfig.columns;
-        let searchs = this.props.tableConfig.searchs;
-        let toolBar = this.props.tableConfig.toolBar;
-        let opCols = this.props.tableConfig.opCols;
-        if (this.props.tableConfig.voPermission) {
-            const permissions = Tools.getChildPermissions(this.props.tableConfig.voPermission);
-            for (let i = 0; i < permissions.length; i++) {
-                let permission = permissions[i];
-                //judge Whether to control permissions
-                if (Tools.checkUserPermission(permission)) {
-                    continue;
+        if (!this.props.voPermission) {
+            throw new Error("voPermission不能为空");
+        }
+        this.state = {
+            paging: {
+                position: ['bottomRight'],
+                size: "small",
+                showSizeChanger: true,
+                showQuickJumper: true,
+                ...this.props.paging
+            },
+            dataSource: [],
+            loading: false
+        };
+        this.formRef = React.createRef();
+    }
+    getColConfig() {
+        let columns = this.props.columns || [];
+        const permissions = Tools.getChildPermissions(this.props.voPermission);
+        for (let i = 0; i < permissions.length; i++) {
+            let permission = permissions[i];
+            if (Tools.checkUserPermission(permission)) {
+                continue;
+            }
+            let permissionNode = permission.replace(this.props.voPermission + ".", "").split('.');
+            if (permissionNode[0] == "cols") {
+                const index = this.getObjIndex(columns, 'key', permissionNode[1]);
+                if (index >= 0 && permissionNode.length == 2) {
+                    columns.splice(index, 1);
                 }
-                let permissionNode = permission.replace(this.props.tableConfig.voPermission + ".", "").split('.');
-                if (permissionNode[0] == "cols") {
-                    const index = this.getObjIndex(columns, 'key', permissionNode[1]);
-                    if (index >= 0 && permissionNode.length == 2) {
-                        columns.splice(index, 1);
+                else if (index >= 0 && permissionNode.length == 3) {
+                    if (permissionNode[1] == "opCols") {
+                        let operationIndex = this.getObjIndex(opCols, 'key', permissionNode[2]);
+                        if (operationIndex >= 0) opCols.splice(operationIndex, 1);
                     }
-                    else if (index >= 0 && permissionNode.length == 3) {
-                        if (permissionNode[1] == "opCols") {
-                            let operationIndex = this.getObjIndex(opCols, 'key', permissionNode[2]);
-                            if (operationIndex >= 0) opCols.splice(operationIndex, 1);
-                        }
-                        if (permissionNode[1] == "operations") {
-                            let operationIndex = this.getObjIndex(columns[index]['operations'], 'key', permissionNode[2]);
-                            columns[index]['operations'].splice(operationIndex, 1);
-                        }
+                }
+            }
+            if (permissionNode[0] == "search") {
+                const index = this.getObjIndex(searchs, 'key', permissionNode[1]);
+                if (index >= 0 && permissionNode.length == 2) {
+                    searchs.splice(index, 1);
+                }
+            }
+            if (permissionNode[0] == "toolBar") {
+                for (let i = 0; i < toolBar.length; i++) {
+                    if (toolBar[i] == permissionNode[1]) {
+                        toolBar.splice(i, 1)
+                    }
+                }
+            }
 
-                    }
-                }
-                if (permissionNode[0] == "search") {
-                    const index = this.getObjIndex(searchs, 'key', permissionNode[1]);
-                    if (index >= 0 && permissionNode.length == 2) {
-                        searchs.splice(index, 1);
-                    }
-                }
-                if (permissionNode[0] == "toolBar") {
-                    for (let i = 0; i < toolBar.length; i++) {
-                        if (toolBar[i] == permissionNode[1]) {
-                            toolBar.splice(i, 1)
-                        }
-                    }
-                }
-
+        }
+        let opCols = this.props.opCols || [];
+        let newOpCols = [];
+        let opWidth = 0;
+        for (let i = 0; i < opCols.length; i++) {
+            if (Tools.checkUserPermission(this.props.voPermission + ".op." + opCols[i].key)) {
+                newOpCols.push(opCols[i]);
+                opWidth += opCols[i].width ? opCols[i].width : 100;
             }
         }
-        let opIndex = this.getObjIndex(columns, 'key', 'operations');
-        if (opIndex >= 0) {
-            let operationsCol = columns[opIndex];
-            let opCol = {
-                title: operationsCol.title,
-                valueType: 'option',
-                key: 'operations',
-                render: () => {
-                    const operations = [];
-                    for (let i = 0; i < operationsCol["operations"].length; i++) {
-                        if (operationsCol["operations"][i].type == "button") {
-                            operations.push(<button key={operationsCol["operations"][i].key} onClick={(a, b, c) => { operationsCol["operations"][i].onClick(a, b, c); }}>{operationsCol["operations"][i].title}</button>);
-                        }
-                        else if (operationsCol["operations"][i].type == "link") {
-                            operations.push(<a key={operationsCol["operations"][i].key} onClick={(a, b, c) => { operationsCol["operations"][i].onClick(a, b, c); }}>{operationsCol["operations"][i].title}</a>);
-                        }
-                    }
-                    return operations;
-                },
-            }
-            columns[opIndex] = opCol;
-        }
-        let opColsIndex = this.getObjIndex(columns, 'key', 'opCols');
-        if (opColsIndex >= 0) {
-            let operationsCol = columns[opColsIndex];
+        if (opCols.length) {
             let attribute = {
-                ...operationsCol,
-                render: () => {
+                title: "操作",
+                fixed: 'right',
+                align: 'center',
+                width: opWidth,
+                render: (_, record) => {
                     const operations = [];
                     opCols.forEach((v, i) => {
-                        operations.push(<Button type={v.type} key={v.key} >{v.title}</Button>);
+                        operations.push(<Button onClick={function () { v.onClick(record); }} type={v.type} key={v.key} >{v.title}</Button>);
                     })
                     return operations;
                 },
             }
-            columns[opColsIndex] = attribute;
+            columns.push(attribute);
         }
-        this.state = {
-            columns: columns,
-            selectedRowKeys: [],
-            dataSource: []
+        return columns;
+    }
+    //ToDo
+    getSearchForm() {
+        const children = [];
+        let element;
+        for (let i = 0; i < this.props.searchs.length; i++) {
+            if (!Tools.checkUserPermission(this.props.voPermission + ".search." + this.props.searchs[i].key)) {
+                continue;
+            }
+            if (this.props.searchs[i].type == 'datePicker') {
+                element = <DatePicker />
+            } else if (this.props.searchs[i].type == 'input') {
+                element = <Input placeholder="placeholder" />
+            } else if (this.props.searchs[i].type == 'select') {
+                element = <Select >
+                    <Select.Option value="lucy">Lucy</Select.Option>
+                </Select>
+            }
+            children.push(
+                <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>
+                    <Form.Item
+                        name={this.props.searchs[i].title}
+                        label={this.props.searchs[i].title}
+                    >
+                        {element}
+                    </Form.Item>
+                </Col>,
+            );
+        }
+        return children.length > 0 ? children : null;
+    }
+    getToolBar() {
+        const children = [];
+        this.props.toolBar.forEach((v, i) => {
+            if (!Tools.checkUserPermission(this.props.voPermission + ".tool_bar." + v.key)) {
+                return;
+            }
+            if (children.length == 0) {
+                children.push(<Button type={v.type} key={v.key} onClick={() => { v.onClick(this.state.dataSource) }}>{v.title}</Button>);
+            } else {
+                children.push(
+                    <Button type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon}>{v.title}</Button>
+                )
+            }
+        });
+        return children;
+    }
+    getSearchConditions() {
+        return {
+            page: this.state.paging.current,
+            size: this.state.paging.pageSize,
+            conditions: this.formRef ? this.formRef.current.getFieldValue() : []
         };
-        this.searchs = searchs;
-        this.toolBar = toolBar;
-        this.pagination = {
-            position: ['bottomRight'],
-            size: "small",
-            showSizeChanger: true,
-            showQuickJumper: true,
-            ...this.props.tableConfig.paging
+    }
+    refreshData(current, pageSize) {
+        this.setState({ loading: true })
+        if (current) {
+            this.state.paging.current = current;
         }
-        this.formRef = React.createRef();
+        if (pageSize) {
+            this.state.paging.pageSize = pageSize;
+        }
+        if (this.props.dataSource instanceof Array) {
+            this.dataSourceLoaded({ count: this.props.dataSource.length, rows: this.props.dataSource });
+        }
+        else {
+            Tools.callAPI(this.props.dataSource, this.getSearchConditions(), (result) => {
+                this.setState({ loading: false })
 
+                if (result.success) {
+                    this.dataSourceLoaded(result.data);
+                    return result.data;
+                }
+            });
+        }
     }
-    CompnentDidMount() {
-        Tools.callAPI(this.props.tableConfig.dataAction, { "conditions": {} }, this.successCallBack);
+    componentDidMount() {
+        this.refreshData(1);
     }
-
+    dataSourceLoaded(date) {
+        this.state.paging.total = date.count;
+        this.setState({ dataSource: date.rows, paging: this.state.paging });
+    }
     getObjIndex(objList, attribute, value) {
         for (let i = 0; i < objList.length; i++) {
             if (objList[i][attribute] == value) {
@@ -119,76 +176,25 @@ class VoTable extends React.Component {
         }
         return -1;
     }
-    tooBarClick = () => {
-        console.log("click toobar");
-    }
-    getToolBar = () => {
-        const children = [];
-        this.toolBar.forEach((v, i) => {
-            children.push(
-                <Button type={v.type} onClick={() => v.onClick()} style={{ marginBottom: 20 }} key={i} icon={v.icon}>{v.title}</Button>
-            )
-        });
-        return children
-    }
-    getFields = () => {
-        const children = [];
-        let frame;
-        for (let i = 0; i < this.searchs.length; i++) {
-            if (this.searchs[i].type == 'datePicker') {
-                frame = <DatePicker />
-            } else if (this.searchs[i].type == 'input') {
-                frame = <Input placeholder="placeholder" />
-            } else if (this.searchs[i].type == 'select') {
-                frame = <Select style={{ width: 120 }}>
-                    <Select.Option value="lucy">Lucy</Select.Option>
-                </Select>
-            }
-            children.push(
-                <Col span={8 * this.searchs[i].colSpan} key={i}>
-                    <Form.Item
-                        name={`${this.searchs[i].title}`}
-                        label={`${this.searchs[i].title}`}
-                    >
-                        {frame}
-                        {/* <DatePicker/> */}
-                    </Form.Item>
-                </Col>,
-            );
-        }
-        return children.length > 0 ? children : null;
-    };
-    successCallBack = (result) => {
-        this.setState({ dataSource: result.data.rows });
-    }
-    onSelectChange = (selectedRowKeys, selectRows) => {
-        Tools.logMsg(selectRows);
-        this.setState({ selectedRowKeys });
-    };
-    onReset = () => {
+    onResetClick() {
         this.formRef.current.resetFields();
     };
-    onFinish = (values) => {
-        Tools.logMsg(values);
+    onSearchClick() {
+        this.refreshData(1);
     };
     render() {
-
         return (
             <>
                 {
-                    !this.getFields() ? null : <Card style={{ marginBottom: 10 }}>
+                    !this.getSearchForm() ? null : <Card style={{ marginBottom: 10 }}>
                         <Form
-                            onFinish={this.onFinish}
                             ref={this.formRef}
                         >
-                            <Row gutter={24}>{this.getFields()}</Row>
-                            {this.state.columns.length == 0 ? null :
-                                <Col span={24} style={{ textAlign: 'right' }}>
-                                    <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>Search</Button>
-                                    <Button style={{ margin: '0 8px' }} onClick={_ => onReset()}>Clear</Button>
-                                </Col>
-                            }
-
+                            <Row gutter={24}>{this.getSearchForm()}</Row>
+                            <Col span={24} style={{ textAlign: 'right' }}>
+                                <Button type="primary" onClick={() => this.onSearchClick()} icon={<SearchOutlined />}>搜索</Button>
+                                <Button style={{ margin: '0 8px' }} onClick={() => this.onResetClick()}>重置</Button>
+                            </Col>
                         </Form>
                     </Card>
                 }
@@ -196,8 +202,8 @@ class VoTable extends React.Component {
                     <Space>
                         {this.getToolBar()}
                     </Space>
-                    <Button type="link" className={styles.refresh} icon={<RedoOutlined />}></Button>
-                    <Table {...this.props.tableConfig.otherConfig} {...this.state} pagination={this.pagination} rowSelection={this.rowSelection} />
+                    <Button type="link" className={styles.refresh} onClick={() => { this.refreshData(); }} icon={<RedoOutlined />}></Button>
+                    <Table {...this.props.otherConfig} loading={this.state.loading} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.getColConfig()} onChange={(pagination) => { this.refreshData(pagination.current, pagination.pageSize) }} />
                 </Card>
             </>
         )

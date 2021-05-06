@@ -1,4 +1,4 @@
-import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Modal, TreeSelect } from 'antd';
+import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Modal, TreeSelect, Popconfirm } from 'antd';
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/Tools';
@@ -19,7 +19,8 @@ class VoTable extends React.Component {
                 ...this.props.paging
             },
             dataSource: [],
-            loading: false
+            loading: false,
+            columns: [],
         };
         this.formRef = React.createRef();
     }
@@ -77,13 +78,24 @@ class VoTable extends React.Component {
                 render: (_, record) => {
                     const operations = [];
                     opCols.forEach((v, i) => {
-                        operations.push(<Button onClick={function () { v.onClick(record); }} type={v.type} key={v.key} >{v.title}</Button>);
+                        if (v.key == "delete") {
+                            operations.push(
+                                <Popconfirm title="确定要删除么？" okText="是" cancelText="否" key={v.key} onConfirm={()=>{v.onClick(record)}}>
+                                    <Button type={v.type} icon={v.icon}>{v.title}</Button>
+                                </Popconfirm>
+                            )
+                        } else if(v.key == "edit"){
+                            operations.push(<Button onClick={ ()=> { v.onClick(record, this.state.dataSource); }} type={v.type} key={v.key} icon={v.icon}>{v.title}</Button>);
+                        }else {
+                            operations.push(<Button onClick={function () { v.onClick(record); }} type={v.type} key={v.key} icon={v.icon}>{v.title}</Button>);  
+                        }
                     })
                     return operations;
                 },
             }
             columns.push(attribute);
         }
+        this.setState({ columns })
         return columns;
     }
     //ToDo
@@ -106,7 +118,7 @@ class VoTable extends React.Component {
             children.push(
                 <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>
                     <Form.Item
-                        name={this.props.searchs[i].title}
+                        name={this.props.searchs[i].key}
                         label={this.props.searchs[i].title}
                     >
                         {element}
@@ -123,10 +135,10 @@ class VoTable extends React.Component {
                 return;
             }
             if (children.length == 0) {
-                children.push(<Button type={v.type} key={v.key} onClick={() => { v.onClick(this.state.dataSource) }}>{v.title}</Button>);
+                children.push(<Button type={v.type} key={v.key} onClick={() => { v.onClick(this.state.dataSource) }} icon={v.icon}>{v.title}</Button>);
             } else {
                 children.push(
-                    <Button type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon}>{v.title}</Button>
+                    <Button type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
                 )
             }
         });
@@ -163,6 +175,8 @@ class VoTable extends React.Component {
     }
     componentDidMount() {
         this.refreshData(1);
+        this.getColConfig();
+        Tools.logMsg(this.state.dataSource)
     }
     dataSourceLoaded(date) {
         this.state.paging.total = date.count;
@@ -203,7 +217,7 @@ class VoTable extends React.Component {
                         {this.getToolBar()}
                     </Space>
                     <Button type="link" className={styles.refresh} onClick={() => { this.refreshData(); }} icon={<RedoOutlined />}></Button>
-                    <Table {...this.props.otherConfig} loading={this.state.loading} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.getColConfig()} onChange={(pagination) => { this.refreshData(pagination.current, pagination.pageSize) }} />
+                    <Table {...this.props.otherConfig} loading={this.state.loading} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination) => { this.refreshData(pagination.current, pagination.pageSize) }} />
                 </Card>
             </>
         )

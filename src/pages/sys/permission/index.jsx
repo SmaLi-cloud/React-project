@@ -1,8 +1,11 @@
 import VoTable from '@/pages/components/VoTable';
 import React, { useState, useRef } from 'react';
-import { Modal, Form, TreeSelect, Input } from 'antd';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Modal, Form, TreeSelect, Input, Button, message, Breadcrumb, Card } from 'antd';
+import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/Tools';
+import { PageContainer } from '@ant-design/pro-layout';
+import styles from './index.less';
+
 
 const tableList = () => {
   const formRef = useRef();
@@ -10,46 +13,67 @@ const tableList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [treeValue, setTreeValue] = useState("");
   const [treeData, setTreeData] = useState([]);
-
+  const [adjustModal, setAdjustModal] = useState({});
   const opCols = [
     {
-      key: 'add',
+      key: 'edit',
       title: "修改",
-      type: "button",
-      onClick: function (recode) {
-        console.log(recode)
+      type: "link",
+      icon: <EditOutlined />,
+      onClick: async function (record, dataSource) {
+        setAdjustModal({title:'修改权限', disabled:true})
+        let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
+        setTreeData(treeData)
+        await setIsModalVisible(true)
+        formRef.current.setFieldsValue({ ...record })
+        console.log(dataSource)
       },
-      width: 80
+      width: 100
     },
     {
-      key: 'edit',
+      key: 'delete',
       title: "删除",
       type: "link",
-      onClick: function () {
-        console.log("edit click")
+      icon: <DeleteOutlined />,
+      onClick: function (record) {
+        let deleteOptions = 'sys.permission:delete'
+        let deleteData = {};
+        deleteData.permissionId = record.id;
+        Tools.callAPI(deleteOptions, deleteData, (result) => {
+          if (result.success && result.data) {
+            message.success('删除成功');
+            table.current.refreshData()
+          } else if (!result.success) {
+            message.error('删除失败');
+          }
+        }, (result) => {
+          console.log(result);
+        })
       },
-      width: 80
+      width: 100
     }
   ]
   const columns = [
     {
-      title: 'name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'code',
+      title: '权限点',
       dataIndex: 'code',
       key: 'code',
     },
     {
-      title: 'level',
+      title: '层级',
       dataIndex: 'level',
+      sorter: (a, b) => a.level - b.level,
       key: 'level',
     },
     {
-      title: 'orderNo',
+      title: '排序',
       dataIndex: 'orderNo',
+      sorter: (a, b) => a.orderNo - b.orderNo,
       key: 'orderNo',
     },
   ];
@@ -61,7 +85,7 @@ const tableList = () => {
   };
   const searchs = [
     {
-      title: 'name',
+      title: '名称',
       dataIndex: '',
       key: 'name',
       type: 'input',
@@ -71,48 +95,81 @@ const tableList = () => {
       dataSource: [],//string，[]
       //取数据的方式
     }, {
-      title: 'code',
+      title: '权限点',
       dataIndex: '',
       key: 'code',
       type: 'input',
       colSpan: 1,
     }, {
-      title: 'level',
+      title: '层级',
       dataIndex: '',
       key: 'level',
-      type: 'select',
+      type: 'input',
       colSpan: 1,
     },
   ];
-  const toolBar = [{
-    title: 'add',
-    type: 'primary',
-    key: 'add',
-    icon: <PlusOutlined />,
-    onClick: (dataSource) => {
-      console.log(dataSource);
-      let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
-      setTreeData(treeData)
-      setIsModalVisible(true)
-    },
-  }, {
-    title: 'edit',
-    type: 'link',
-    key: 'edit',
-    icon: <EditOutlined />,
-    onClick: () => {
-      console.log('toolBar edit click');
-    },
-  }];
-
+  const toolBar = [
+    {
+      title: '添加权限',
+      type: 'primary',
+      key: 'add',
+      icon: <PlusOutlined />,
+      onClick: (dataSource) => {
+        setAdjustModal({title:'添加权限', disabled:false})
+        let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
+        setTreeData(treeData)
+        setIsModalVisible(true)
+      },
+    }];
 
   const onTreeSelect = (_, node) => {
-    formRef.current.setFieldsValue({code: node.code+'.'})
+    formRef.current.setFieldsValue({ code: node.code + '.' })
   }
-
-  const onSelectChange = (selectedRowKeys) => {
-    Tools.logMsg(selectedRowKeys);
+  // const onSelectChange = (selectedRowKeys) => {
+  //   Tools.logMsg(selectedRowKeys);
+  // }
+  const onAddPermission = () => {
+    let addOptions = 'sys.permission:save'
+    let AddPermissionData = {}
+    AddPermissionData.permissionInfo = formRef.current.getFieldValue();
+    delete AddPermissionData.permissionInfo.title;
+    delete AddPermissionData.permissionInfo.parentName;
+    delete AddPermissionData.permissionInfo.value;
+    formRef.current.resetFields();
+    setIsModalVisible(false)
+    Tools.callAPI(addOptions, AddPermissionData, (result) => {
+      if (result.success && result.data) {
+        message.success('操作/修改成功');
+        table.current.refreshData()
+      } else if (!result.success) {
+        message.error('操作/修改失败');
+      }
+    }, (result) => {
+      console.log(result);
+    })
   }
+  const closeModal = () => {
+    formRef.current.resetFields();
+    setIsModalVisible(false)
+  }
+  const numberOnly = (e) => {
+    const { value } = e.target;
+    const reg = /^-?\d*(\.\d*)?$/;
+    if ((!isNaN(value) && reg.test(value)) || value === '' || value === '-') {
+      formRef.current.setFieldsValue({ orderNo: value })
+    } else {
+      let newvalue = value.substr(0, value.length - 1);
+      formRef.current.setFieldsValue({ orderNo: newvalue })
+    }
+  }
+  const formItemLayout = {
+    labelCol: {
+      span: 6,
+    },
+    wrapperCol: {
+      span: 14,
+    },
+  };
   const tableConfig = {
     searchs,
     columns,
@@ -122,19 +179,14 @@ const tableList = () => {
     dataSource: 'sys.permission:search',
     otherConfig: {
       rowKey: "id",
-      rowSelection: {
-        type: 'checkbox',
-        onChange: onSelectChange
-      },
-      bordered: true
+      // rowSelection: {
+      //   type: 'checkbox',
+      //   onChange: onSelectChange
+      // },
+      bordered: true,
     },
     voPermission: "sys.staff.list",
   };
-
-  const onClick = () => {
-    console.log(table);
-    table.current.refreshData(1);
-  }
   const tProps = {
     treeData,
     value: treeValue,
@@ -146,20 +198,45 @@ const tableList = () => {
   };
   return (
     <>
-      <VoTable {...tableConfig} ref={table} />
-      <Modal title="添加权限" visible={isModalVisible} >
-        <Form ref ={formRef}>
-          <Form.Item label="父权限" name="parent">
-            <TreeSelect {...tProps} />
-          </Form.Item>
-          <Form.Item label="权限名称" name="name">
-            <Input />
-          </Form.Item>
-          <Form.Item label="权限点" name="code">
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <PageContainer
+        header={{
+          title: '权限管理',
+          breadcrumb: {
+            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+          }
+        }}
+      >
+        <VoTable {...tableConfig} ref={table} />
+      <Modal title={adjustModal.title} footer={null} visible={isModalVisible} onCancel={closeModal}>
+          <Form
+            ref={formRef}
+            {...formItemLayout}
+            onFinish={onAddPermission} >
+            <Form.Item label="父权限" name="parentId">
+            <TreeSelect {...tProps} disabled={adjustModal.disabled} />
+            </Form.Item>
+            <Form.Item
+              label="权限名称"
+              name="name"
+              rules={[{ required: true, message: '请输入名称!' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item label="权限点" name="code"
+              rules={[{ required: true, message: '请输入权限点!' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item label="排序" name="orderNo" onChange={numberOnly}>
+              <Input />
+            </Form.Item>
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+              <Button type="primary" htmlType="submit" >提交</Button>
+              <Button type="primary" className={styles.btnCancel} onClick={closeModal}>取消</Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </PageContainer>
     </>
   );
 };

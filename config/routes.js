@@ -1,7 +1,6 @@
 export default [
   {
     path: '/',
-    // component: '../layouts/BlankLayout',
     routes: [
       {
         path: '/user',
@@ -26,6 +25,7 @@ export default [
                 redirect: '/login',
               },
               {
+                path:'/sys',
                 name: 'sys',
                 icon: 'crown',
                 authority:['sys'],
@@ -36,6 +36,13 @@ export default [
                     icon: 'smile',
                     component: './sys/permission',
                     authority:['sys.permission'],
+                  },
+                  {
+                    path: '/sys/dictionary',
+                    name: 'dictionary',
+                    icon: 'smile',
+                    component: './sys/dictionary',
+                    authority:['sys.dictionary'],
                   },
                 ],
               },

@@ -50,7 +50,7 @@ const tableList = () => {
   const paging = {
     pageSize: 10,
     current: 1,
-    total: 50,
+    total: 0,
     pageSizeOptions: [5, 10, 20, 40]
   };
   const searchs = [
@@ -78,7 +78,6 @@ const tableList = () => {
       colSpan: 1,
     },
   ];
-
   const toolBar = [{
     title: 'add',
     type: 'primary',

@@ -11,14 +11,15 @@ const dictionaryList = () => {
     <>
       <PageContainer
         header={{
-          title: '图书管理',
+          title: '字典管理',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
-
-      
+          <Card>
+            
+          </Card>
       </PageContainer>
     </>
   );

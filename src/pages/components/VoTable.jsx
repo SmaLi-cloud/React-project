@@ -109,7 +109,7 @@ class VoTable extends React.Component {
             if (this.props.searchs[i].type == 'datePicker') {
                 element = <DatePicker />
             } else if (this.props.searchs[i].type == 'input') {
-                element = <Input placeholder="placeholder" />
+                element = <Input />
             } else if (this.props.searchs[i].type == 'select') {
                 element = <Select >
                     <Select.Option value="lucy">Lucy</Select.Option>
@@ -217,7 +217,7 @@ class VoTable extends React.Component {
                         {this.getToolBar()}
                     </Space>
                     <Button type="link" className={styles.refresh} onClick={() => { this.refreshData(); }} icon={<RedoOutlined />}></Button>
-                    <Table {...this.props.otherConfig} loading={this.state.loading} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination) => { this.refreshData(pagination.current, pagination.pageSize) }} />
+                    <Table {...this.props.otherConfig} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination) => { this.refreshData(pagination.current, pagination.pageSize) }} />
                 </Card>
             </>
         )

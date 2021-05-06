@@ -4,14 +4,16 @@
  * @see You can view component api by: https://github.com/ant-design/ant-design-pro-layout
  */
 import ProLayout, { DefaultFooter } from '@ant-design/pro-layout';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Link, useIntl, history } from 'umi';
 import { GithubOutlined } from '@ant-design/icons';
-import { Result, Button } from 'antd';
+import { Result, Button, Spin } from 'antd';
 import { Authorized } from '@/utils/setMenuAuthority';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { getMatchMenu } from '@umijs/route-utils';
 import logo from '../assets/logo.svg';
+import * as Tools from '@/utils/Tools';
+
 const noMatch = (
   <Result
     status={403}
@@ -49,6 +51,7 @@ const defaultFooterDom = (
 );
 
 const BasicLayout = (props) => {
+  const [isShowMask, setIsShowMask] = useState(false);
   const {
     children,
     settings,
@@ -66,36 +69,43 @@ const BasicLayout = (props) => {
     [location.pathname],
   );
 
+  Tools.addListener('setMaskState', 'basicLayout', (state) => {
+    setIsShowMask(state);
+  })
+
   const { formatMessage } = useIntl();
   return (
-    <ProLayout
-      logo={logo}
-      formatMessage={formatMessage}
-      {...props}
-      {...settings}
-      onMenuHeaderClick={() => history.push('/')}
-      menuItemRender={(menuItemProps, defaultDom) => {
-        if (
-          menuItemProps.isUrl ||
-          !menuItemProps.path ||
-          location.pathname === menuItemProps.path
-        ) {
-          return defaultDom;
-        }
-        return <Link to={menuItemProps.path}>{defaultDom}</Link>;
-      }}
-      footerRender={() => defaultFooterDom }
-      menuDataRender={menuDataRender}
-      rightContentRender={() => <RightContent />}
-      postMenuData={(menuData) => {
-        menuDataRef.current = menuData || [];
-        return menuData || [];
-      }}
-    >
-      <Authorized authority={authorized.authority} noMatch={noMatch}>
-        {children}
-      </Authorized>
-    </ProLayout>
+    <Spin spinning={isShowMask}>
+      <ProLayout
+        logo={logo}
+        formatMessage={formatMessage}
+        {...props}
+        {...settings}
+        onMenuHeaderClick={() => history.push('/')}
+        menuItemRender={(menuItemProps, defaultDom) => {
+          if (
+            menuItemProps.isUrl ||
+            !menuItemProps.path ||
+            location.pathname === menuItemProps.path
+          ) {
+            return defaultDom;
+          }
+          return <Link to={menuItemProps.path}>{defaultDom}</Link>;
+        }}
+        footerRender={() => defaultFooterDom}
+        menuDataRender={menuDataRender}
+        rightContentRender={() => <RightContent />}
+        postMenuData={(menuData) => {
+          menuDataRef.current = menuData || [];
+          return menuData || [];
+        }}
+      >
+        <Authorized authority={authorized.authority} noMatch={noMatch}>
+          {children}
+        </Authorized>
+      </ProLayout>
+    </Spin>
+
   );
 };
 

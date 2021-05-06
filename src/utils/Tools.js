@@ -2,6 +2,10 @@ import config from './config';
 import Storage from './Storage';
 import { parse } from 'querystring';
 import request from 'umi-request';
+import { Spin } from 'antd';
+import * as styles from './loading.less';
+
+let eventList = [];
 
 /**
  * 随机码GUID
@@ -19,7 +23,7 @@ function getGuid() {
  * @param {"user:login"} action
  * @param { Object,Array } data
  */
-function callAPI(action, data, successCallback, errorCallback) {
+function callAPI(action, data, successCallback, errorCallback, noMask) {
   const token = Storage.get('voToken');
   let headers = {
     'Request-Unid': getGuid(),
@@ -36,26 +40,65 @@ function callAPI(action, data, successCallback, errorCallback) {
     headers: headers,
     mode: 'cors',
   };
+  if (noMask !== true) {
+    sendEvent('setMaskState', true);
+  }
   request(config.prefix, options)
     .then((result) => {
-      console.log("请求",result);
-      const { success } = result;
-
-      // window.location.href = "http://localhost:8000/formList"
-      // if (action !== 'api/login/count' && !result.needLogin) {
-      // const url = encodeURIComponent(window.location.href);
-      // window.location.href ='/user/login?redirect='+url;
-      // }
+      sendEvent('setMaskState', false);
+      console.log('请求', result);
       if (successCallback) {
         successCallback(lineToHump(result));
       }
     })
     .catch((err) => {
+      sendEvent('setMaskState', false);
       logMsg(err);
       if (errorCallback) {
         errorCallback(err);
       }
     });
+}
+function addListener(event, uniKey, callback) {
+  if (!eventList[event]) {
+    eventList[event] = [];
+  }
+  for (var i = 0; i < eventList[event].length; i++) {
+    if (eventList[event][i].uniKey == uniKey) {
+      eventList[event][i].callback = callback;
+      return;
+    }
+  }
+  eventList[event].push({ callback: callback, uniKey: uniKey });
+}
+
+function sendEvent(event, param) {
+  if (!eventList[event]) {
+    return;
+  }
+  for (var i = 0; i < eventList[event].length; i++) {
+    if (eventList[event][i].callback) {
+      eventList[event][i].callback(param);
+    }
+  }
+}
+
+function clearListener(event) {
+  if (!eventList[event]) {
+    return;
+  }
+  delete eventList[event];
+}
+
+function removeListener(event, uniKey) {
+  if (!eventList[event]) {
+    return;
+  }
+  for (var i = 0; i < eventList[event].length; i++) {
+    if (eventList[event][i].uniKey == uniKey) {
+      eventList[event].splice(i, 1);
+    }
+  }
 }
 
 function getChildPermissions(parentKey) {
@@ -231,4 +274,8 @@ export {
   buildTree,
   getTreeParent,
   formatNumber,
+  addListener,
+  sendEvent,
+  clearListener,
+  removeListener,
 };

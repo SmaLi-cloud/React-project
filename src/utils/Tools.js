@@ -286,10 +286,11 @@ function getVerifyRule(rouleName, callback) {
 
 function verify(rouleName, data, callback) {
   getVerifyRule(rouleName, function (verifyRules) {
+    console.log(verifyRules);
     verifyMsg = [];
     var checkFlag = true;
     for (var key in verifyRules) {
-      var result = verifyItem(verifyRules[key], data);
+      var result = verifyItem(key, verifyRules[key], data);
       if (checkFlag) {
         checkFlag = result;
       }
@@ -298,7 +299,7 @@ function verify(rouleName, data, callback) {
   });
 }
 
-function verifyItem(verifyRule, data) {
+function verifyItem(key, verifyRule, data) {
   if (!verifyRule.verifications) {
     return true;
   }
@@ -307,10 +308,10 @@ function verifyItem(verifyRule, data) {
       return true;
     }
   }
-  if (!data.hasOwnProperty(verifyRule.id)) {
-    data[verifyRule.id] = '';
+  if (!data.hasOwnProperty(key)) {
+    data[key] = '';
   }
-  var inputValue = data[verifyRule.id];
+  var inputValue = data[key];
   if (verifyRule.allowEmpty && inputValue == '') {
     return true;
   }
@@ -416,7 +417,7 @@ function verifyItem(verifyRule, data) {
 }
 
 function showMessage(title, messages) {
-  if (messages instanceof String) {
+  if (!(messages instanceof Array)) {
     messages = messages.split('\n');
   }
   let children = [];

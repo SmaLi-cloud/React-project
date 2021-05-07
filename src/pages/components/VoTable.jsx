@@ -1,10 +1,11 @@
-import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Modal, TreeSelect, Popconfirm } from 'antd';
+import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Alert, TreeSelect, Popconfirm } from 'antd';
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import styles from './VoTable.less'
 
 class VoTable extends React.Component {
+    
     constructor(props) {
         super(props);
         if (!this.props.voPermission) {
@@ -22,7 +23,11 @@ class VoTable extends React.Component {
             loading: false,
             columns: [],
             sorter: [],
-            searchConditions: []
+            searchConditions: [],
+            checkboxSelect: {
+                length: 0,
+                list: []
+            }
         };
         this.formRef = React.createRef();
     }
@@ -118,6 +123,13 @@ class VoTable extends React.Component {
                     element = <Input value={defaultValue} />
                 } else if (this.props.searchs[i].type == 'treeSelect') {
                     element = <TreeSelect value={defaultValue} treeData={this.props.searchs[i].dataSource} />
+                } else if (this.props.searchs[i].type == 'select') { // ToDo...
+                    let selectOptions = [];
+                    if (this.props.searchs[i].dataSource) {
+                        this.props.searchs[i].dataSource.forEach((v, i) => {
+                        })
+                    }
+                    element = <Select></Select>
                 }
                 children.push(
                     <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>
@@ -181,7 +193,7 @@ class VoTable extends React.Component {
             Tools.callAPI(this.props.dataSource, this.getSearchConditions(), (result) => {
                 this.setState({ loading: false })
                 if (result.success) {
-                Tools.logMsg(result)
+                    Tools.logMsg(result)
 
                     this.dataSourceLoaded(result.data);
                     return result.data;
@@ -194,7 +206,6 @@ class VoTable extends React.Component {
         this.getColConfig();
         Tools.logMsg(this.state.dataSource)
     }
-
     dataSourceLoaded(data) {
         // Tools.logMsg('数据',data)
         this.state.paging.total = data.count;
@@ -214,6 +225,10 @@ class VoTable extends React.Component {
     onSearchClick() {
         this.refreshData(1);
     };
+    popupAlter(length) {
+        Tools.logMsg(length)
+        this.setState({ checkboxSelect: { length: length } })
+    }
     render() {
         return (
             <>
@@ -235,6 +250,18 @@ class VoTable extends React.Component {
                         {this.getToolBar()}
                     </Space>
                     <Button type="link" className={styles.refresh} onClick={() => { this.refreshData(); }} icon={<RedoOutlined />}></Button>
+                    {this.state.checkboxSelect.length ? <Alert
+                        message={'已选择' + this.state.checkboxSelect.length + '项目'}
+                        type="info"
+                        action={
+                            <Space>
+                                <Button size="small" type="primary">批量删除</Button>
+                                <Button size="small" type="primary">取消选择</Button>
+                            </Space>
+                        }
+                        closable
+                    /> : null
+                    }
                     <Table {...this.props.otherConfig} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination, _, sorter) => { this.refreshData(pagination.current, pagination.pageSize, sorter) }} />
                 </Card>
             </>

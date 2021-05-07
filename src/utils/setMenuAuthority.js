@@ -1,7 +1,7 @@
 import config from './config';
-import Storage from './Storage';
+import Storage from './storage';
 // import { setAuthority } from './authority';
-import * as Tools from '@/utils/Tools';
+import * as Tools from '@/utils/tools';
 import RenderAuthorize from '@/components/Authorized';
 
 const getAuthority = (str) => {

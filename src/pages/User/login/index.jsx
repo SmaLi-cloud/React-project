@@ -9,8 +9,8 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
 import styles from './index.less';
-import * as Tools from '@/utils/Tools';
-import Storage from '@/utils/Storage'
+import * as Tools from '@/utils/tools';
+import Storage from '@/utils/storage'
 import setMenuAuthority from "@/utils/setMenuAuthority";
 
 const LoginMessage = ({ content }) => (

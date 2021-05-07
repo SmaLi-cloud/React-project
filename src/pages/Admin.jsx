@@ -1,6 +1,6 @@
 import React from 'react';
 import ProTable from '@ant-design/pro-table';
-import { logMsg } from '@/utils/Tools';
+import { logMsg } from '@/utils/tools';
 
 const columns = [
     {

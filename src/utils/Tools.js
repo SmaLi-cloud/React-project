@@ -1,11 +1,13 @@
 import config from './config';
-import Storage from './Storage';
+import Storage from './storage';
 import { parse } from 'querystring';
 import request from 'umi-request';
-import { Spin } from 'antd';
-import * as styles from './loading.less';
+import { stringify } from 'querystring';
+import { Modal } from 'antd';
 
 let eventList = [];
+let verifys = {};
+let verifyMsg = [];
 
 /**
  * 随机码GUID
@@ -35,7 +37,7 @@ function callAPI(action, data, successCallback, errorCallback, noMask) {
   data['action'] = action;
   const options = {
     method: 'POST',
-    data: humpToLine(data),
+    data: humpToLine(JSON.parse(JSON.stringify(data))),
     timeout: config.timeout,
     headers: headers,
     mode: 'cors',
@@ -45,10 +47,16 @@ function callAPI(action, data, successCallback, errorCallback, noMask) {
   }
   request(config.prefix, options)
     .then((result) => {
+      result = lineToHump(result);
       sendEvent('setMaskState', false);
-      console.log('请求', result);
+      if (result.needLogin) {
+        let queryString = stringify({
+          redirect: window.location.href,
+        });
+        window.location.href = config.prefix + '/user/login?' + queryString;
+      }
       if (successCallback) {
-        successCallback(lineToHump(result));
+        successCallback(result);
       }
     })
     .catch((err) => {
@@ -59,6 +67,7 @@ function callAPI(action, data, successCallback, errorCallback, noMask) {
       }
     });
 }
+
 function addListener(event, uniKey, callback) {
   if (!eventList[event]) {
     eventList[event] = [];
@@ -262,6 +271,164 @@ function formatNumber(value) {
 
 const getPageQuery = () => parse(window.location.href.split('?')[1]);
 
+function getVerifyRule(rouleName, callback) {
+  if (verifys[rouleName]) {
+    callback(verifys[rouleName]);
+    return;
+  }
+  callAPI('sys.verify:get_rule', { rouleName: rouleName }, (result) => {
+    if (result.success) {
+      verifys[rouleName] = result.data;
+      callback(verifys[rouleName]);
+    }
+  });
+}
+
+function verify(rouleName, data, callback) {
+  getVerifyRule(rouleName, function (verifyRules) {
+    verifyMsg = [];
+    var checkFlag = true;
+    for (var key in verifyRules) {
+      var result = verifyItem(verifyRules[key], data);
+      if (checkFlag) {
+        checkFlag = result;
+      }
+    }
+    callback(checkFlag, verifyMsg);
+  });
+}
+
+function verifyItem(verifyRule, data) {
+  if (!verifyRule.verifications) {
+    return true;
+  }
+  if (verifyRule.clientCondition) {
+    if (!eval(verifyRule.clientCondition)) {
+      return true;
+    }
+  }
+  if (!data.hasOwnProperty(verifyRule.id)) {
+    data[verifyRule.id] = '';
+  }
+  var inputValue = data[verifyRule.id];
+  if (verifyRule.allowEmpty && inputValue == '') {
+    return true;
+  }
+  for (var i = 0; i < verifyRule.verifications.length; i++) {
+    let verification = verifyRule.verifications[i];
+    if (verification.type === 'empty') {
+      if (!inputValue) {
+        if (verification.errMsg) {
+          verifyMsg.push(verification.errMsg);
+          return false;
+        }
+      }
+    } else if (verification.type === 'length') {
+      if (verification.value) {
+        if (inputValue.length !== parseInt(verification.value, 10)) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'min_length') {
+      if (verification.value) {
+        if (inputValue.length < parseInt(verification.value, 10)) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'max_length') {
+      if (verification.value) {
+        if (inputValue.length > parseInt(verification.value, 10)) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'regexp') {
+      if (verification.value) {
+        reg = new RegExp(verification.value);
+        if (!inputValue.match(reg)) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'function') {
+      if (verification.value) {
+        if (!eval(verification.value + '(data);')) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'equal') {
+      if (verification.value) {
+        if (inputValue !== data[verification.value]) {
+          if (verification.errMsg) {
+            verifyMsg.push(verification.errMsg);
+            return false;
+          }
+        }
+      }
+    } else if (verification.type === 'mail') {
+      var regMail = /^(([A-Za-z0-9\-]+_+)|([A-Za-z0-9\-]+\-+)|([A-Za-z0-9\-]+\.+)|([A-Za-z0-9\-]+\++))*[A-Za-z0-9_\-]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6}$/;
+      if (!regMail.test(inputValue)) {
+        if (verification.errMsg) {
+          verifyMsg.push(verification.errMsg);
+          return false;
+        }
+      }
+    } else if (verification.type === 'date') {
+      var regDatetime = /^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[1-2]\d|3[0-1])$/;
+      if (!regDatetime.test(inputValue)) {
+        if (verification.errMsg) {
+          verifyMsg.push(verification.errMsg);
+          return false;
+        }
+      }
+    } else if (verification.type === 'number') {
+      var regNumber = /^(-?[1-9][0-9]*|0)$/;
+      if (!regNumber.test(inputValue)) {
+        if (verification.errMsg) {
+          verifyMsg.push(verification.errMsg);
+          return false;
+        }
+      }
+    } else if (verification.type === 'float') {
+      var regFloat = /^-?[0-9]+.?[0-9]*$/;
+      if (!regFloat.test(inputValue)) {
+        if (verification.errMsg) {
+          verifyMsg.push(verification.errMsg);
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+function showMessage(title, messages) {
+  if (messages instanceof String) {
+    messages = messages.split('\n');
+  }
+  let children = [];
+  messages.forEach((message, i) => {
+    children.push(<div key={i}>{message}</div>);
+  });
+  Modal.error({
+    title: title,
+    content: <div>{children}</div>,
+  });
+}
+
 export {
   getGuid,
   callAPI,
@@ -278,4 +445,6 @@ export {
   sendEvent,
   clearListener,
   removeListener,
+  verify,
+  showMessage,
 };

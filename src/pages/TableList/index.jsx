@@ -1,7 +1,7 @@
 import VoTable from '@/pages/components/VoTable';
 import React, { useRef  } from 'react';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import * as Tools from '@/utils/Tools';
+import * as Tools from '@/utils/tools';
 
 const tableList = () => {
 

@@ -1,4 +1,4 @@
-import * as Tools from '@/utils/Tools';
+import * as Tools from '@/utils/tools';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin, Dropdown } from 'antd';
 import React from 'react';

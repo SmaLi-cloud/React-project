@@ -2,11 +2,11 @@ import { Popconfirm, Space, Menu, Dropdown, Button } from 'antd';
 import React from 'react';
 import ProTable from '@ant-design/pro-table';
 import { DownOutlined } from '@ant-design/icons';
-import Storage from '@/utils/Storage';
+import Storage from '@/utils/storage';
 import roleCheck from '@/pages/components/AdminPackage'
 import roleCheck2 from '@/pages/components/AdminPackage'
 
-import { getComponet,logMsg } from '../../utils/Tools'
+import { getComponet,logMsg } from '../../utils/tools'
 const RoleMap = {
     admin: {
         name: '管理员',

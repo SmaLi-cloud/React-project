@@ -12,7 +12,7 @@ import { Authorized } from '@/utils/setMenuAuthority';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { getMatchMenu } from '@umijs/route-utils';
 import logo from '../assets/logo.svg';
-import * as Tools from '@/utils/Tools';
+import * as Tools from '@/utils/tools';
 
 const noMatch = (
   <Result

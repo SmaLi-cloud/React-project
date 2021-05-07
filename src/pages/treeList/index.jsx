@@ -1,5 +1,5 @@
 import React from 'react'
-import * as Tools from '@/utils/Tools'
+import * as Tools from '@/utils/tools'
 import { Card, TreeSelect, Button, Modal, Form, Input } from 'antd';
 
 class Demo extends React.Component {

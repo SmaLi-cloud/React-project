@@ -1,8 +1,8 @@
 import VoTable from '@/pages/components/VoTable';
-import React, { useState, useRef } from 'react';
-import { Modal, Form, TreeSelect, Input, Button, message, Breadcrumb, Card, Spin } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
+import { Modal, Form, TreeSelect, Input, Button, message, notification } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import * as Tools from '@/utils/Tools';
+import * as Tools from '@/utils/tools';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
 
@@ -14,6 +14,16 @@ const tableList = () => {
   const [treeValue, setTreeValue] = useState("");
   const [treeData, setTreeData] = useState([]);
   const [adjustModal, setAdjustModal] = useState({});
+
+  useEffect(() => {
+    Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+      if (result.success) {
+        let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
+        setTreeData(treeData)
+      }
+    });
+  }, []);
+
   const opCols = [
     {
       key: 'edit',
@@ -43,7 +53,8 @@ const tableList = () => {
             message.success('删除成功');
             table.current.refreshData()
           } else if (!result.success) {
-            message.error('删除失败');
+            Tools.showMessage('删除失败', result.msg);
+            return;
           }
         }, (result) => {
           console.log(result);
@@ -59,20 +70,20 @@ const tableList = () => {
       key: 'name',
     },
     {
-      title: '权限点',
+      title: '权限编码',
       dataIndex: 'code',
+      sorter: true,
       key: 'code',
     },
     {
       title: '层级',
       dataIndex: 'level',
-      sorter: (a, b) => a.level - b.level,
       key: 'level',
     },
     {
       title: '排序',
       dataIndex: 'orderNo',
-      sorter: (a, b) => a.orderNo - b.orderNo,
+      sorter: true,
       key: 'orderNo',
     },
   ];
@@ -94,18 +105,27 @@ const tableList = () => {
       dataSource: [],//string，[]
       //取数据的方式
     }, {
-      title: '权限点',
+      title: '父权限',
+      dataIndex: '',
+      key: 'parentId',
+      type: 'treeSelect',
+      colSpan: 1,
+      dataSource: treeData
+    }, {
+      title: '权限编码',
       dataIndex: '',
       key: 'code',
       type: 'input',
       colSpan: 1,
-    }, {
+    },
+    {
       title: '层级',
       dataIndex: '',
       key: 'level',
       type: 'input',
       colSpan: 1,
     },
+
   ];
   const toolBar = [
     {
@@ -113,11 +133,13 @@ const tableList = () => {
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
-      onClick: (dataSource) => {
+      onClick: async (dataSource) => {
         setAdjustModal({ title: '添加权限', disabled: false })
         let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
         setTreeData(treeData)
-        setIsModalVisible(true)
+        await setIsModalVisible(true)
+        formRef.current.resetFields();
+
       },
     }];
 
@@ -129,23 +151,25 @@ const tableList = () => {
   // }
   const onAddPermission = () => {
     let addOptions = 'sys.permission:save'
-    let AddPermissionData = {}
-    AddPermissionData.permissionInfo = formRef.current.getFieldValue();
-    delete AddPermissionData.permissionInfo.title;
-    delete AddPermissionData.permissionInfo.parentName;
-    delete AddPermissionData.permissionInfo.value;
-    formRef.current.resetFields();
-    setIsModalVisible(false)
-    Tools.callAPI(addOptions, AddPermissionData, (result) => {
-      if (result.success) {
-        message.success('保存成功');
-        table.current.refreshData()
-      } else if (!result.success) {
-        message.error('保存失败');
+    let permissionData = formRef.current.getFieldValue();
+    Tools.verify('sys.vf_permission', permissionData, (result, err) => {
+      if (!result) {
+        Tools.showMessage('保存失败', err);
+        return;
       }
-    }, (result) => {
-      console.log(result);
+      Tools.callAPI(addOptions, { permissionInfo: permissionData }, (result) => {
+        if (result.success) {
+          message.success('保存成功');
+          setIsModalVisible(false)
+          table.current.refreshData()
+        } else if (!result.success) {
+          Tools.showMessage('保存失败', result.msg);
+        }
+      }, (result) => {
+        console.log(result);
+      })
     })
+
   }
   const closeModal = () => {
     formRef.current.resetFields();
@@ -186,11 +210,13 @@ const tableList = () => {
     },
     voPermission: "sys.staff.list",
   };
+
+
   const tProps = {
     treeData,
     value: treeValue,
     onSelect: onTreeSelect,
-    placeholder: 'Please select',
+    placeholder: '请选择父权限',
     style: {
       width: '100%',
     },
@@ -214,19 +240,13 @@ const tableList = () => {
           <Form.Item label="父权限" name="parentId">
             <TreeSelect {...tProps} disabled={adjustModal.disabled} />
           </Form.Item>
-          <Form.Item
-            label="权限名称"
-            name="name"
-            rules={[{ required: true, message: '请输入名称!' }]}
-          >
+          <Form.Item label="权限名称" name="name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="权限点" name="code"
-            rules={[{ required: true, message: '请输入权限点!' }]}
-          >
+          <Form.Item label="权限编码" name="code" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="排序" name="orderNo" onChange={numberOnly}>
+          <Form.Item label="排序" name="orderNo" onChange={numberOnly} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

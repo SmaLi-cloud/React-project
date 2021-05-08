@@ -10,8 +10,6 @@ import styles from './index.less';
 const tableList = () => {
   const formRef = useRef();
   const table = useRef();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [treeValue, setTreeValue] = useState("");
   const [treeData, setTreeData] = useState([]);
   const [adjustModal, setAdjustModal] = useState({});
 
@@ -23,18 +21,14 @@ const tableList = () => {
       }
     });
   }, []);
-
   const opCols = [
     {
       key: 'edit',
       title: "修改",
       type: "link",
       icon: <EditOutlined />,
-      onClick: async function (record, dataSource) {
-        setAdjustModal({ title: '修改权限', disabled: true })
-        let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
-        setTreeData(treeData)
-        await setIsModalVisible(true)
+      onClick: async function (record) {
+        await setAdjustModal({ title: '修改权限', disabled: true, isModalVisible: true });
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
@@ -90,7 +84,7 @@ const tableList = () => {
   const paging = {
     pageSize: 10,
     current: 1,
-    total: 50,
+    total: 0,
     pageSizeOptions: [5, 10, 20, 40]
   };
   const searchs = [
@@ -134,21 +128,14 @@ const tableList = () => {
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async (dataSource) => {
-        setAdjustModal({ title: '添加权限', disabled: false })
-        let treeData = Tools.buildTree(dataSource, 'id', 'parentId', 'children', "")
-        setTreeData(treeData)
-        await setIsModalVisible(true)
+        await setAdjustModal({ title: '添加权限', disabled: false, isModalVisible: true })
         formRef.current.resetFields();
-
       },
-    }];
-
+    }
+  ];
   const onTreeSelect = (_, node) => {
     formRef.current.setFieldsValue({ code: node.code + '.' })
   }
-  // const onSelectChange = (selectedRowKeys) => {
-  //   Tools.logMsg(selectedRowKeys);
-  // }
   const onAddPermission = () => {
     let addOptions = 'sys.permission:save'
     let permissionData = formRef.current.getFieldValue();
@@ -160,7 +147,7 @@ const tableList = () => {
       Tools.callAPI(addOptions, { permissionInfo: permissionData }, (result) => {
         if (result.success) {
           message.success('保存成功');
-          setIsModalVisible(false)
+          setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
           Tools.showMessage('保存失败', result.msg);
@@ -169,11 +156,10 @@ const tableList = () => {
         console.log(result);
       })
     })
-
   }
   const closeModal = () => {
     formRef.current.resetFields();
-    setIsModalVisible(false)
+    setAdjustModal({ isModalVisible: false })
   }
   const numberOnly = (e) => {
     const { value } = e.target;
@@ -202,19 +188,12 @@ const tableList = () => {
     dataSource: 'sys.permission:search',
     otherConfig: {
       rowKey: "id",
-      // rowSelection: {
-      //   type: 'checkbox',
-      //   onChange: onSelectChange
-      // },
       bordered: true,
     },
     voPermission: "sys.staff.list",
   };
-
-
   const tProps = {
     treeData,
-    value: treeValue,
     onSelect: onTreeSelect,
     placeholder: '请选择父权限',
     style: {
@@ -222,7 +201,6 @@ const tableList = () => {
     },
   };
   return (
-
     <PageContainer
       header={{
         title: '权限管理',
@@ -232,7 +210,7 @@ const tableList = () => {
       }}
     >
       <VoTable {...tableConfig} ref={table} />
-      <Modal title={adjustModal.title} footer={null} visible={isModalVisible} onCancel={closeModal}>
+      <Modal title={adjustModal.title} footer={null} visible={adjustModal.isModalVisible} onCancel={closeModal}>
         <Form
           ref={formRef}
           {...formItemLayout}
@@ -257,7 +235,6 @@ const tableList = () => {
       </Modal>
 
     </PageContainer>
-
   );
 };
 

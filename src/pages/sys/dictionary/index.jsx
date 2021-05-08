@@ -6,16 +6,12 @@ import * as Tools from '@/utils/tools';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
 
-
 const dictionaryList = () => {
 
   const table = useRef();
   const formRef = useRef();
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [adjustModal, setAdjustModal] = useState({});
-  const [typeList, setTypeList] = useState([]);
   const [selectOptions, setSelectOptions] = useState([]);
-
 
   const searchs = [
     {
@@ -66,7 +62,7 @@ const dictionaryList = () => {
   const paging = {
     pageSize: 10,
     current: 1,
-    total: 50,
+    total: 0,
     pageSizeOptions: [5, 10, 20, 40]
   };
   const toolBar = [
@@ -76,20 +72,7 @@ const dictionaryList = () => {
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        setAdjustModal({ title: '添加', disabled: false })
-        addSelectOptions();
-        await setIsModalVisible(true);
-        formRef.current.resetFields();
-      }
-    }, {
-      title: '添加类型',
-      type: 'primary',
-      key: 'add',
-      icon: <PlusOutlined />,
-      onClick: async () => {
-        setAdjustModal({ title: '添加', disabled: false })
-        addSelectOptions();
-        await setIsModalVisible(true);
+        await setAdjustModal({ title: '添加', disabled: false, isModalVisible: true })
         formRef.current.resetFields();
       }
     }
@@ -100,10 +83,8 @@ const dictionaryList = () => {
       title: "修改",
       type: "link",
       icon: <EditOutlined />,
-      onClick: async (record) => {
-        setAdjustModal({ title: '修改', disabled: false })
-        await setIsModalVisible(true)
-        addSelectOptions();
+      onClick: async (record, dataSource) => {
+        await setAdjustModal({ title: '修改', disabled: true, isModalVisible: true })
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
@@ -144,40 +125,35 @@ const dictionaryList = () => {
     otherConfig: {
       rowKey: "id",
       bordered: true,
-      rowSelection: {
-        type: 'checkbox',
-        onChange: (selectedRowKeys) => {
-          Tools.logMsg(selectedRowKeys)
-          table.current.popupAlter(selectedRowKeys.length)
-        }
-      },
     },
-    voPermission: "sys.staff.list",
+    // rowSelectType: 'checkbox',
+    voPermission: "sys.staff.dictionary",
+  };
+  const formItemLayout = {
+    labelCol: {
+      span: 6,
+    },
+    wrapperCol: {
+      span: 14,
+    },
   };
   useEffect(() => {
-
+    let typeList = [];
+    let checkList = [];
     Tools.callAPI('sys.dictionary:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
-        Tools.logMsg("chenggng")
-        Tools.logMsg(result)
-        let typeList = [];
-        let checkList = [];
         result.data.rows.forEach((v, i) => {
           if (!checkList.includes(v.typeNames)) {
-            typeList.push(v.typeNames)
             checkList.push(v.typeNames)
-        debugger
-
-            
+            typeList.push({ title: v.typeNames, typeCode: v.typeCode })
           }
         })
-        setTypeList(typeList)
       }
+      addSelectOptions(typeList);
     });
   }, []);
-  const addSelectOptions = () => {
+  const addSelectOptions = (typeList) => {
     let children = [];
-    debugger
     if (!typeList.length) return;
     typeList.forEach((v, i) => {
       children.push(
@@ -188,7 +164,7 @@ const dictionaryList = () => {
   }
   const closeModal = () => {
     formRef.current.resetFields();
-    setIsModalVisible(false)
+    setAdjustModal({ isModalVisible: false })
   }
   const onSaveDictionary = () => {
     let addOptions = 'sys.dictionary:save'
@@ -202,7 +178,8 @@ const dictionaryList = () => {
       Tools.callAPI(addOptions, { dictionaryInfo: dictionaryData }, (result) => {
         if (result.success) {
           message.success('保存成功');
-          setIsModalVisible(false)
+          setAdjustModal({ isModalVisible: false })
+
           table.current.refreshData()
         } else if (!result.success) {
           Tools.showMessage('保存失败', result.msg);
@@ -212,15 +189,6 @@ const dictionaryList = () => {
       })
     })
   }
-
-  const formItemLayout = {
-    labelCol: {
-      span: 6,
-    },
-    wrapperCol: {
-      span: 14,
-    },
-  };
   return (
     <>
       <PageContainer
@@ -232,14 +200,14 @@ const dictionaryList = () => {
         }}
       >
         <VoTable {...tableConfig} ref={table} />
-        <Modal title={adjustModal.title} footer={null} visible={isModalVisible} onCancel={closeModal}>
+        <Modal title={adjustModal.title} footer={null} visible={adjustModal.isModalVisible} onCancel={closeModal}>
           <Form
             {...formItemLayout}
             ref={formRef}
             onFinish={onSaveDictionary}
           >
             <Form.Item label="字典码" name="typeCode" rules={[{ required: true }]}>
-              <Select>{selectOptions}</Select>
+              <Select disabled={adjustModal.disabled}>{selectOptions}</Select>
             </Form.Item>
             <Form.Item label="字典值" name="itemName" rules={[{ required: true }]}>
               <Input />
@@ -252,7 +220,6 @@ const dictionaryList = () => {
               <Button type="primary" className={styles.btnCancel} onClick={closeModal}>取消</Button>
             </Form.Item>
           </Form>
-
         </Modal>
       </PageContainer>
     </>

@@ -2,10 +2,12 @@ import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, 
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
+import moment from 'moment';
 import styles from './VoTable.less'
+const { RangePicker } = DatePicker;
 
 class VoTable extends React.Component {
-    
+
     constructor(props) {
         super(props);
         if (!this.props.voPermission) {
@@ -21,15 +23,23 @@ class VoTable extends React.Component {
             },
             dataSource: [],
             loading: false,
-            columns: [],
+            columns: this.getColConfig(),
             sorter: [],
             searchConditions: [],
-            checkboxSelect: {
-                length: 0,
-                list: []
-            }
+            selectedRowKeys: []
         };
+        if (this.props.rowSelectType) {
+            this.state.rowSelection = {
+                type: this.props.rowSelectType,
+                onChange: (selectedRowKeys) => {
+                    this.setState({ selectedRowKeys: selectedRowKeys });
+                }
+            }
+        }
         this.formRef = React.createRef();
+    }
+    getSelectedRowKeys() {
+        return this.state.selectedRowKeys;
     }
     getColConfig() {
         let columns = this.props.columns || [];
@@ -102,7 +112,6 @@ class VoTable extends React.Component {
             }
             columns.push(attribute);
         }
-        this.setState({ columns })
         return columns;
     }
     getSearchForm() {
@@ -117,19 +126,12 @@ class VoTable extends React.Component {
                 if (!Tools.checkUserPermission(this.props.voPermission + ".search." + this.props.searchs[i].key)) {
                     continue;
                 }
-                if (this.props.searchs[i].type == 'datePicker') {
-                    element = <DatePicker value={defaultValue} />
+                if (this.props.searchs[i].type == 'RangePicker') {
+                    element = <RangePicker showTime  style={{ width: '100%' }} value={defaultValue} />
                 } else if (this.props.searchs[i].type == 'input') {
-                    element = <Input value={defaultValue} />
+                    element = <Input value={defaultValue} style={{ width: '100%' }} />
                 } else if (this.props.searchs[i].type == 'treeSelect') {
-                    element = <TreeSelect value={defaultValue} treeData={this.props.searchs[i].dataSource} />
-                } else if (this.props.searchs[i].type == 'select') { // ToDo...
-                    let selectOptions = [];
-                    if (this.props.searchs[i].dataSource) {
-                        this.props.searchs[i].dataSource.forEach((v, i) => {
-                        })
-                    }
-                    element = <Select></Select>
+                    element = <TreeSelect value={defaultValue} treeData={this.props.searchs[i].dataSource} style={{ width: '100%' }} />
                 }
                 children.push(
                     <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>
@@ -154,18 +156,32 @@ class VoTable extends React.Component {
                     return;
                 }
                 if (children.length == 0) {
-                    children.push(<Button type={v.type} key={v.key} onClick={() => { v.onClick(this.state.dataSource) }} icon={v.icon}>{v.title}</Button>);
+                    children.push(<Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} key={v.key} onClick={v.onClick} icon={v.icon}>{v.title}</Button>);
                 } else {
                     children.push(
-                        <Button type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
+                        <Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
                     )
                 }
             });
         }
         return children;
     }
+    formatSearchFormTime(timeValue) {
+        let writeTime = {}
+        if (timeValue instanceof Array) {
+            writeTime.start = moment(timeValue[0]).format('YYYY-MM-DD HH:mm:ss')
+            writeTime.end = moment(timeValue[1]).format('YYYY-MM-DD HH:mm:ss')
+        } else {
+            writeTime = moment(timeValue).format('YYYY-MM-DD HH:mm:ss')
+        }
+        this.state.searchConditions.writeTime = writeTime;
+    }
     getSearchConditions() {
         this.state.searchConditions = this.formRef.current ? this.formRef.current.getFieldValue() : [];
+        this.state.searchConditions = Tools.cloneDeep(this.state.searchConditions)
+        if (this.state.searchConditions.writeTime) {
+            this.formatSearchFormTime(this.state.searchConditions.writeTime)
+        }
         let searchConditions = {
             page: this.state.paging.current,
             size: this.state.paging.pageSize,
@@ -194,7 +210,6 @@ class VoTable extends React.Component {
                 this.setState({ loading: false })
                 if (result.success) {
                     Tools.logMsg(result)
-
                     this.dataSourceLoaded(result.data);
                     return result.data;
                 }
@@ -203,8 +218,6 @@ class VoTable extends React.Component {
     }
     componentDidMount() {
         this.refreshData(1);
-        this.getColConfig();
-        Tools.logMsg(this.state.dataSource)
     }
     dataSourceLoaded(data) {
         // Tools.logMsg('数据',data)
@@ -225,10 +238,6 @@ class VoTable extends React.Component {
     onSearchClick() {
         this.refreshData(1);
     };
-    popupAlter(length) {
-        Tools.logMsg(length)
-        this.setState({ checkboxSelect: { length: length } })
-    }
     render() {
         return (
             <>
@@ -250,19 +259,7 @@ class VoTable extends React.Component {
                         {this.getToolBar()}
                     </Space>
                     <Button type="link" className={styles.refresh} onClick={() => { this.refreshData(); }} icon={<RedoOutlined />}></Button>
-                    {this.state.checkboxSelect.length ? <Alert
-                        message={'已选择' + this.state.checkboxSelect.length + '项目'}
-                        type="info"
-                        action={
-                            <Space>
-                                <Button size="small" type="primary">批量删除</Button>
-                                <Button size="small" type="primary">取消选择</Button>
-                            </Space>
-                        }
-                        closable
-                    /> : null
-                    }
-                    <Table {...this.props.otherConfig} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination, _, sorter) => { this.refreshData(pagination.current, pagination.pageSize, sorter) }} />
+                    <Table {...this.props.otherConfig} rowSelection={this.state.rowSelection} dataSource={this.state.dataSource} pagination={this.state.paging} columns={this.state.columns} onChange={(pagination, _, sorter) => { this.refreshData(pagination.current, pagination.pageSize, sorter) }} />
                 </Card>
             </>
         )

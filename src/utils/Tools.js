@@ -4,6 +4,7 @@ import { parse } from 'querystring';
 import request from 'umi-request';
 import { stringify } from 'querystring';
 import { Modal } from 'antd';
+import lodash from 'lodash'
 
 let eventList = [];
 let verifys = {};
@@ -429,6 +430,9 @@ function showMessage(title, messages) {
     content: <div>{children}</div>,
   });
 }
+function cloneDeep(data) {
+return lodash.cloneDeep(data)
+}
 
 export {
   getGuid,
@@ -448,4 +452,5 @@ export {
   removeListener,
   verify,
   showMessage,
+  cloneDeep,
 };

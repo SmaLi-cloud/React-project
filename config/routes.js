@@ -44,6 +44,13 @@ export default [
                     component: './sys/dictionary',
                     authority:['sys.dictionary'],
                   },
+                  {
+                    path: '/sys/log',
+                    name: 'log',
+                    icon: 'smile',
+                    component: './sys/log',
+                    authority:['sys.log'],
+                  },
                 ],
               },
               {

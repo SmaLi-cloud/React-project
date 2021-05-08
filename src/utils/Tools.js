@@ -452,5 +452,5 @@ export {
   removeListener,
   verify,
   showMessage,
-  cloneDeep,
+  cloneDeep
 };

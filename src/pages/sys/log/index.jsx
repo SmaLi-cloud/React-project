@@ -23,7 +23,7 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: 'ip地址',
+      title: 'Ip地址',
       dataIndex: '',
       key: 'ip',
       type: 'input',
@@ -56,7 +56,7 @@ const dictionaryList = () => {
       key: 'accountName',
     },
     {
-      title: 'ip地址',
+      title: 'Ip地址',
       dataIndex: 'ip',
       key: 'ip',
     },
@@ -165,16 +165,6 @@ const dictionaryList = () => {
     rowSelectType: 'checkbox',
     voPermission: "sys.staff.log",
   };
-  const setWriteTime = (day) => {
-    let writeTime = {}
-    writeTime.end = moment().format('YYYY-MM-DD HH:mm:ss');
-    writeTime.start = moment().subtract(day, 'days').format('YYYY-MM-DD HH:mm:ss');
-    return writeTime;
-  }
-  useEffect(() => {
-
-  }, []);
-
 
   return (
     <>

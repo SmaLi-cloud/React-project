@@ -50,7 +50,7 @@ const Login = () => {
         Tools.logMsg(result)
         const {data} = result;
         setSubmit(false)
-        setMsg(data.msg)
+        // setMsg(data.msg)
     }
 
     const [type, setType] = useState('account');

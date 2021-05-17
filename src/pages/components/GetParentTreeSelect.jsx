@@ -36,6 +36,7 @@ class getParentTreeSelect extends React.Component {
       }
     }
     Tools.logMsg(Array.from(this.permissionId))
+    this.props.onChange(Array.from(this.permissionId))
   };
   successCallBack = (result) => {
     this.rows = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
@@ -46,6 +47,7 @@ class getParentTreeSelect extends React.Component {
   }
   componentDidMount() {
     let treeList = Tools.cloneDeep(this.props.treeList)
+    Tools.logMsg(treeList)
     // Tools.callAPI('sys.permission:search', { "conditions": {} }, this.successCallBack, this.errorCallBack)
     this.rows = Tools.buildTree(treeList, 'id', 'parentId', 'children', "")
     this.setState({ treeData: this.rows })
@@ -57,10 +59,10 @@ class getParentTreeSelect extends React.Component {
       onChange: this.onChange,
       onSearch: this.onSearch,
       labelInValue: false,
-      // treeCheckable: true,
-      placeholder: 'Please select',
+      treeCheckable: true,
+      placeholder: '请选择权限',
       style: {
-        width: '50%',
+        width: '100%',
       },
     };
     return (

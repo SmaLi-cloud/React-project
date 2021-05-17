@@ -354,7 +354,7 @@ function verifyItem(key, verifyRule, data) {
       }
     } else if (verification.type === 'regexp') {
       if (verification.value) {
-        reg = new RegExp(verification.value);
+        let reg = new RegExp(verification.value);
         if (!inputValue.match(reg)) {
           if (verification.errMsg) {
             verifyMsg.push(verification.errMsg);

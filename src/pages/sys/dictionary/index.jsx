@@ -83,7 +83,7 @@ const dictionaryList = () => {
       title: "修改",
       type: "link",
       icon: <EditOutlined />,
-      onClick: async (record, dataSource) => {
+      onClick: async (record) => {
         await setAdjustModal({ title: '修改', disabled: true, isModalVisible: true })
         formRef.current.setFieldsValue({ ...record })
       },

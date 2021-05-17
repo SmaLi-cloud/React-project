@@ -37,9 +37,9 @@ const dictionaryList = () => {
       title: '请求时间',
       dataIndex: '',
       key: 'writeTime',
-      type: 'RangePicker',
+      type: 'DatePicker',
       colSpan: 2,
-      defaultValue: "",
+      defaultValue: '',
       placeholder: "",
       dataSource: [],
     }
@@ -170,7 +170,7 @@ const dictionaryList = () => {
     <>
       <PageContainer
         header={{
-          title: '字典管理',
+          title: '日志文件',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }

@@ -3,6 +3,7 @@ import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import moment from 'moment';
+import DatePickers from './DatePicker'
 import styles from './VoTable.less'
 const { RangePicker } = DatePicker;
 
@@ -26,7 +27,7 @@ class VoTable extends React.Component {
             columns: this.getColConfig(),
             sorter: [],
             searchConditions: [],
-            selectedRowKeys: []
+            selectedRowKeys: [],
         };
         if (this.props.rowSelectType) {
             this.state.rowSelection = {
@@ -114,6 +115,7 @@ class VoTable extends React.Component {
         }
         return columns;
     }
+
     getSearchForm() {
         const children = [];
         let element;
@@ -126,8 +128,9 @@ class VoTable extends React.Component {
                 if (!Tools.checkUserPermission(this.props.voPermission + ".search." + this.props.searchs[i].key)) {
                     continue;
                 }
-                if (this.props.searchs[i].type == 'RangePicker') {
-                    element = <RangePicker showTime  style={{ width: '100%' }} value={defaultValue} />
+                if (this.props.searchs[i].type == 'DatePicker') {
+                    // transfer onChange Make the form get DatePickers value
+                    element = <DatePickers onChange={(val) =>{}} />
                 } else if (this.props.searchs[i].type == 'input') {
                     element = <Input value={defaultValue} style={{ width: '100%' }} />
                 } else if (this.props.searchs[i].type == 'treeSelect') {
@@ -179,6 +182,7 @@ class VoTable extends React.Component {
     getSearchConditions() {
         this.state.searchConditions = this.formRef.current ? this.formRef.current.getFieldValue() : [];
         this.state.searchConditions = Tools.cloneDeep(this.state.searchConditions)
+        Tools.logMsg(this.formRef.current.getFieldValue())
         if (this.state.searchConditions.writeTime) {
             this.formatSearchFormTime(this.state.searchConditions.writeTime)
         }
@@ -196,6 +200,7 @@ class VoTable extends React.Component {
     refreshData(current, pageSize, sorter) {
         this.setState({ loading: true })
         if (current) {
+
             this.state.paging.current = current;
         }
         if (pageSize) {

@@ -7,7 +7,7 @@ class getParentTreeSelect extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: [],
+      value: ['608a7d98007d0000e2000634'],
       treeData: [],
     };
     this.permissionId = new Set();

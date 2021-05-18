@@ -4,7 +4,7 @@ import { parse } from 'querystring';
 import request from 'umi-request';
 import { stringify } from 'querystring';
 import { Modal } from 'antd';
-import lodash from 'lodash'
+import lodash from 'lodash';
 
 let eventList = [];
 let verifys = {};
@@ -431,9 +431,21 @@ function showMessage(title, messages) {
   });
 }
 function cloneDeep(data) {
-return lodash.cloneDeep(data)
+  return lodash.cloneDeep(data);
 }
-
+function getTreeChild(tree, arr) {
+  for (let i = 0; i < tree.length; i++) {
+    if (!tree[i].children) {
+      continue;
+    }
+    if (tree[i].children && tree[i].id == permission) {
+      return true;
+    } else {
+      return getTreeChild(tree[i].children, permission);
+    }
+  }
+  return false
+}
 export {
   getGuid,
   callAPI,
@@ -452,5 +464,6 @@ export {
   removeListener,
   verify,
   showMessage,
-  cloneDeep
+  cloneDeep,
+  getTreeChild,
 };

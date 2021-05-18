@@ -1,18 +1,21 @@
 import VoTable from '@/pages/components/VoTable';
 import GetParentTreeSelect from '@/pages/components/GetParentTreeSelect';
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select, message, Input, TreeSelect, Button } from 'antd';
+import { Modal, Form, Select, message, Input, Button } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
+const { Option } = Select;
 
 
 const staffList = () => {
 
     const table = useRef();
     const formRef = useRef();
+    const treeSelectRef = useRef();
     const [treeList, setTreeList] = useState([]);
+    const [roleOption, setRoleOption] = useState([]);
     const [adjustModal, setAdjustModal] = useState({});
 
     const searchs = [
@@ -42,22 +45,50 @@ const staffList = () => {
             title: '员工姓名',
             dataIndex: 'trueName',
             key: 'trueName',
+            width: 150
         },
         {
             title: '电话',
             dataIndex: 'phone',
             key: 'phone',
+            width: 120
         },
         {
             title: '登录次数',
             dataIndex: 'loginCount',
             key: 'loginCount',
+            width: 120
         },
         {
             title: '最近登陆时间',
             dataIndex: 'lastLoginTime',
             sorter: true,
             key: 'lastLoginTime',
+            width: 200
+
+        },
+        {
+            title: '角色',
+            dataIndex: 'roleNames',
+            key: 'roleNames',
+            render: (tag) => {
+                let tagStr = Tools.cloneDeep(tag).toString()
+                return (
+                    <>{tagStr}</>
+                )
+            },
+            width: 200
+        },
+        {
+            title: '权限',
+            dataIndex: 'permissionNames',
+            key: 'permissionNames',
+            render: (tag) => {
+                let tagStr = Tools.cloneDeep(tag).toString()
+                return (
+                    <>{tagStr}</>
+                )
+            }
         },
     ];
     const paging = {
@@ -84,7 +115,34 @@ const staffList = () => {
             title: "修改",
             type: "link",
             icon: <EditOutlined />,
-            onClick: (record) => {
+            onClick: async (record) => {
+                console.log(record);
+                let permissionCodes = Tools.cloneDeep(record.permissionCodes);
+                let permissions = Tools.cloneDeep(record.permissions);
+
+                for (let i = 0; i < permissionCodes.length; i++) {
+                    const elementCodei = permissionCodes[i].split('.');
+                    console.log(elementCodei);
+                    for (let j = i; j < permissionCodes.length; j++) {
+                        const elementCodej = permissionCodes[j].split('.');
+                        if(elementCodei.length <elementCodej.length){
+                            for (let k = 0; k < elementCodei.length; k++) {
+                                if(elementCodei.indexOf(elementCodej[k]) < 0){
+                                    permissions.splice(i,1)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                console.log(permissions);
+
+                await setAdjustModal({ title: '修改员工信息', disabled: true, isModalVisible: true });
+                if (record.permissions.length) {
+                    treeSelectRef.current.state.value = permissions
+                }
+                formRef.current.setFieldsValue({ ...record })
+
             },
             width: 100
         },
@@ -104,7 +162,7 @@ const staffList = () => {
                         return;
                     }
                 }, (result) => {
-                    console.log(result);
+                    Tools.logMsg(result);
                 })
             },
             width: 100
@@ -121,7 +179,7 @@ const staffList = () => {
             rowKey: "id",
             bordered: true,
         },
-        rowSelectType: 'checkbox',
+        // rowSelectType: 'checkbox',
         voPermission: "co.staff",
     };
     const formItemLayout = {
@@ -132,12 +190,11 @@ const staffList = () => {
             span: 14,
         },
     };
-
     const closeModal = () => {
         formRef.current.resetFields();
         setAdjustModal({ isModalVisible: false })
     }
-    const onAddStaff = () => {
+    const onSaveStaff = () => {
         let addOptions = 'co.staff:save'
         let addStaffData = formRef.current.getFieldValue();
         Tools.verify('co.vf_staff', addStaffData, (result, err) => {
@@ -160,12 +217,21 @@ const staffList = () => {
     }
     useEffect(() => {
         Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
-          if (result.success) {
-            // let treeList = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
-            setTreeList(result.data.rows)
-          }
+            if (result.success) {
+                setTreeList(result.data.rows)
+            }
         });
-      }, []);
+        Tools.callAPI('sys.role:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+            if (result.success) {
+                const children = [];
+                for (let i = 0; i < result.data.rows.length; i++) {
+                    children.push(<Option key={result.data.rows[i].id} value={result.data.rows[i].id}>{result.data.rows[i].name}</Option>);
+                }
+                setRoleOption(children)
+            }
+        });
+
+    }, []);
     return (
         <>
             <PageContainer
@@ -181,33 +247,42 @@ const staffList = () => {
                     <Form
                         ref={formRef}
                         {...formItemLayout}
-                        onFinish={onAddStaff} >
+                        onFinish={onSaveStaff} >
                         <Form.Item label="员工姓名" name="trueName" rules={[{ required: true }]}>
-                            {/* <TreeSelect {...tProps} disabled={adjustModal.disabled} /> */}
                             <Input />
                         </Form.Item>
-                        <Form.Item label="登录名" name="loginName" rules={[{ required: true }]}>
+                        {adjustModal.disabled ? null : <Form.Item label="登录名" name="loginName" rules={[{ required: true }]}>
                             <Input />
-                        </Form.Item>
-                        <Form.Item label="密码" name="password" rules={[{ required: true }]}>
+                        </Form.Item>}
+                        {adjustModal.disabled ? null : <Form.Item label="密码" name="password" rules={[{ required: true }]}>
                             <Input />
-                        </Form.Item>
+                        </Form.Item>}
                         <Form.Item label="权限" name="permissions" rules={[{ required: true }]}>
-                        <GetParentTreeSelect treeList={treeList} onChange={(val)=>{}}/>
+                            <GetParentTreeSelect treeList={treeList} ref={treeSelectRef} />
+                        </Form.Item>
+                        <Form.Item label="角色" name="roleId" rules={[{ required: true }]}>
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                style={{ width: '100%' }}
+                                placeholder="请选择角色"
+                            >
+                                {roleOption}
+                            </Select>
                         </Form.Item>
                         <Form.Item label="电话" name="phone" rules={[{ required: true }]}>
                             <Input />
                         </Form.Item>
                         <Form.Item label="状态" name="status" rules={[{ required: true }]}>
                             <Select>
-                                <Option value="0">离职</Option>
-                                <Option value="1">在职</Option>
+                                <Option value={0}>离职</Option>
+                                <Option value={1}>在职</Option>
                             </Select>
                         </Form.Item>
                         <Form.Item label="账号" name="enable" rules={[{ required: true }]}>
-                        <Select>
-                                <Option value="0">账号禁用</Option>
-                                <Option value="1">账号启用</Option>
+                            <Select>
+                                <Option value={0}>账号禁用</Option>
+                                <Option value={1}>账号启用</Option>
                             </Select>
                         </Form.Item>
 

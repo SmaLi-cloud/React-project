@@ -117,32 +117,13 @@ const staffList = () => {
             icon: <EditOutlined />,
             onClick: async (record) => {
                 console.log(record);
-                let permissionCodes = Tools.cloneDeep(record.permissionCodes);
-                let permissions = Tools.cloneDeep(record.permissions);
-
-                for (let i = 0; i < permissionCodes.length; i++) {
-                    const elementCodei = permissionCodes[i].split('.');
-                    console.log(elementCodei);
-                    for (let j = i; j < permissionCodes.length; j++) {
-                        const elementCodej = permissionCodes[j].split('.');
-                        if(elementCodei.length <elementCodej.length){
-                            for (let k = 0; k < elementCodei.length; k++) {
-                                if(elementCodei.indexOf(elementCodej[k]) < 0){
-                                    permissions.splice(i,1)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                console.log(permissions);
-
+                let permissions =  Tools.getTreeChild(record.permissionCodes, record.permissions)
+                Tools.logMsg(permissions)
                 await setAdjustModal({ title: '修改员工信息', disabled: true, isModalVisible: true });
                 if (record.permissions.length) {
                     treeSelectRef.current.state.value = permissions
                 }
                 formRef.current.setFieldsValue({ ...record })
-
             },
             width: 100
         },

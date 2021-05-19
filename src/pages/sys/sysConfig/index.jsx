@@ -17,19 +17,9 @@ const RoleList = (props) => {
   const [adjustModal, setAdjustModal] = useState({});
   const searchs = [
     {
-      title: '名字',
+      title: '系统',
       dataIndex: '',
-      key: 'name',
-      type: 'input',
-      colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
-    },
-    {
-      title: '权限编码',
-      dataIndex: '',
-      key: 'permissions',
+      key: 'key',
       type: 'input',
       colSpan: 1,
       defaultValue: "",
@@ -39,35 +29,37 @@ const RoleList = (props) => {
   ];
   const columns = [
     {
-      title: '角色名称',
-      dataIndex: 'name',
-      key: 'name',
+      title: '配置',
+      dataIndex: 'key',
+      key: 'key',
     },
     {
-      title: '描述',
-      dataIndex: 'desc',
-      key: 'desc',
-    },
-    {
-      title: '拥有权限',
-      dataIndex: 'permissionNames',
-      key: 'permissionNames',
-      render: (tag) => {
-        let tagStr = Tools.cloneDeep(tag).toString()
-        return (
-          <>{tagStr}</>
-        )
+      title: '应用系统',
+      dataIndex: 'data',
+      key: 'version',
+      render:(tag)=>{
+        let data = Object.keys(tag);
+        return data;
       }
     },
     {
-      title: '职工名称',
-      dataIndex: 'staffNames',
-      key: 'staffNames',
-      render: (tag) => {
-        let tagStr = Tools.cloneDeep(tag).toString()
-        return (
-          <>{tagStr}</>
-        )
+      title: '系统版本',
+      dataIndex: 'data',
+      key: 'version',
+      render:(tag)=>{
+        let data = Object.keys(tag);
+
+        return tag[data].version;
+      }
+    },
+    {
+      title: '系统地址',
+      dataIndex: 'data',
+      key: 'version',
+      render:(tag)=>{
+        let data = Object.keys(tag);
+
+        return tag[data].url;
       }
     },
   ];
@@ -121,7 +113,7 @@ const RoleList = (props) => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        Tools.callAPI('sys.role:delete', { roleId: record.id }, (result) => {
+        Tools.callAPI('sys.sys_config:delete', { configId: record.id }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
@@ -143,7 +135,7 @@ const RoleList = (props) => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.role:search',
+    dataSource: 'sys.sys_config:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
@@ -198,7 +190,7 @@ const RoleList = (props) => {
     <>
       <PageContainer
         header={{
-          title: '角色管理',
+          title: '系统配置',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }

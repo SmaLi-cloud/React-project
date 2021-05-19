@@ -66,12 +66,20 @@ export default [
                     component: './sys/log',
                     authority: ['sys.log'],
                   },
+
                   {
                     path: '/sys/role',
                     name: 'role',
                     component: './sys/role',
                     authority: ['sys.role'],
                   },
+                  {
+                    path: '/sys/sysConfig',
+                    name: 'sysConfig',
+                    component: './sys/sysConfig',
+                    authority: ['sys.sys_config'],
+                  },
+
                 ],
               },
               

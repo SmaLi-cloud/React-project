@@ -433,18 +433,20 @@ function showMessage(title, messages) {
 function cloneDeep(data) {
   return lodash.cloneDeep(data);
 }
-function getTreeChild(tree, arr) {
-  for (let i = 0; i < tree.length; i++) {
-    if (!tree[i].children) {
-      continue;
-    }
-    if (tree[i].children && tree[i].id == permission) {
-      return true;
-    } else {
-      return getTreeChild(tree[i].children, permission);
-    }
+function getTreeChild(oldPermissionCodes, oldPermissions) {
+  let permissionCodes = cloneDeep(oldPermissionCodes);
+  let permissions = cloneDeep(oldPermissions);
+  for (let i = 0; i < permissionCodes.length; i++) {
+      const code = permissionCodes[i];
+      for (let j = i+1; j < permissionCodes.length; j++) {
+      const codeCompare = permissionCodes[j];
+          if(code.length <codeCompare.length && codeCompare.startsWith(permissionCodes[i])){
+              permissions.splice(i,1)
+              break;
+          }
+      }
   }
-  return false
+  return permissions
 }
 export {
   getGuid,

@@ -14,9 +14,9 @@ const dictionaryList = () => {
 
   const searchs = [
     {
-      title: '名称',
+      title: '服务名称',
       dataIndex: '',
-      key: 'fullName',
+      key: 'serverName',
       type: 'input',
       colSpan: 1,
       defaultValue: "",
@@ -24,47 +24,59 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '系统类型',
+      title: '路径',
       dataIndex: '',
-      key: 'systemType',
-      type: 'input',
-      colSpan: 1,
-      defaultValue: '',
-      placeholder: "",
-      dataSource: [],
-    },
-    {
-      title: '可以使用',
-      dataIndex: '',
-      key: 'canUse',
+      key: 'path',
       type: 'input',
       colSpan: 1,
       defaultValue: "",
       placeholder: "",
       dataSource: [],
     },
-
-
+    {
+      title: '是否启用',
+      dataIndex: '',
+      key: 'status',
+      type: 'select',
+      colSpan: 1,
+      defaultValue: "",
+      placeholder: "",
+      dataSource: [{ label: "", value: '' }, { label: "启用", value: "1" }, { label: "禁用", value: "0" }],
+    },
   ];
   const columns = [
     {
-      title: '名称',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      title: '服务名称',
+      dataIndex: 'serverName',
+      key: 'serverName',
     },
     {
-      title: '系统类型',
-      dataIndex: 'systemType',
-      key: 'systemType',
+      title: '路径',
+      dataIndex: 'path',
+      key: 'path',
     },
     {
-      title: '可以使用',
-      dataIndex: 'canUse',
-      key: 'canUse',
+      title: '负载比',
+      dataIndex: 'loadRatio',
+      key: 'loadRatio',
+    },
+    {
+      title: '地址',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: '是否启用',
+      dataIndex: 'status',
+      key: 'status',
       render: (record) => {
-        return record ? "是" : "否";
-
+        return record ? "启用" : "禁用";
       }
+    },
+    {
+      title: '主机',
+      dataIndex: 'host',
+      key: 'host',
     },
   ];
   const paging = {
@@ -75,16 +87,13 @@ const dictionaryList = () => {
   };
   const toolBar = [
     {
-      title: '添加第三方系统',
+      title: '添加API服务',
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        await setAdjustModal({ title: '添加第三方系统', disabled: false, isModalVisible: true });
-        // formRef.current.resetFields();
-        let guid = Tools.getGuid();
-        let record = { secret: guid }
-        formRef.current.setFieldsValue({ ...record })
+        await setAdjustModal({ title: '添加API服务', disabled: false, isModalVisible: true });
+        formRef.current.resetFields();
       },
     }
   ];
@@ -95,12 +104,36 @@ const dictionaryList = () => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        await setAdjustModal({ title: '修改第三方系统', disabled: true, isModalVisible: true });
+        await setAdjustModal({ title: '修改API服务', disabled: true, isModalVisible: true });
         Tools.logMsg(record)
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
     },
+    {
+      key: 'delete',
+      title: "删除",
+      type: "link",
+      icon: <DeleteOutlined />,
+      onClick: function (record) {
+        let deleteOptions = 'sys.api_server_list:delete'
+        let deletApiServerListData = {};
+        deletApiServerListData.apiServerListId = record.id;
+        Tools.callAPI(deleteOptions, deletApiServerListData, (result) => {
+          Tools.logMsg(result)
+          if (result.success) {
+            message.success('删除成功');
+            table.current.refreshData()
+          } else if (!result.success) {
+            Tools.showMessage('删除失败', result.msg);
+            return;
+          }
+        }, (result) => {
+          console.log(result);
+        })
+      },
+      width: 100
+    }
   ]
   const tableConfig = {
     columns,
@@ -108,12 +141,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'cus.third_party_system:search',
+    dataSource: 'sys.api_server_list:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "cus.third_party_system",
+    voPermission: "sys.api_server_list",
   };
   const formItemLayout = {
     labelCol: {
@@ -124,15 +157,15 @@ const dictionaryList = () => {
     },
   };
   const onSaveThirdPartySystem = () => {
-    let addOptions = 'cus.third_party_system:save'
-    let addThirdPartySystemData = formRef.current.getFieldValue();
-    Tools.logMsg(addThirdPartySystemData)
-    Tools.verify('cus.vf_third_party_system', addThirdPartySystemData, (result, err) => {
+    let addOptions = 'sys.api_server_list:save'
+    let addApiServerListData = formRef.current.getFieldValue();
+    Tools.logMsg(addApiServerListData)
+    Tools.verify('sys.vf_api_server_list', addApiServerListData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err);
         return;
       }
-      Tools.callAPI(addOptions, { thirdPartySystemInfo: addThirdPartySystemData }, (result) => {
+      Tools.callAPI(addOptions, { apiServerListInfo: addApiServerListData }, (result) => {
         if (result.success) {
           message.success('保存成功');
           setAdjustModal({ isModalVisible: false })
@@ -149,17 +182,12 @@ const dictionaryList = () => {
     formRef.current.resetFields();
     setAdjustModal({ isModalVisible: false })
   }
-  const refreshSecret = () => {
-    let sysConfigData = formRef.current.getFieldValue();
-    sysConfigData.secret = Tools.getGuid();
-    formRef.current.resetFields(); //touch render
-    formRef.current.setFieldsValue({ ...sysConfigData })
-  }
+
   return (
     <>
       <PageContainer
         header={{
-          title: '日志文件',
+          title: 'API服务',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
@@ -171,30 +199,26 @@ const dictionaryList = () => {
             ref={formRef}
             {...formItemLayout}
             onFinish={onSaveThirdPartySystem} >
-            <Form.Item label="系统名称" name="fullName" rules={[{ required: true }]}>
+            <Form.Item label="服务名称" name="serverName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="系统类型" name="systemType" rules={[{ required: true }]}>
-              <Select>
-                <Select.Option value='external'>外部</Select.Option>
-                <Select.Option value='internal'>内部</Select.Option>
-              </Select>
-
+            <Form.Item label="路径" name="path" rules={[{ required: true }]}>
+              <Input />
             </Form.Item>
-            <Form.Item label="密钥" name="secret" rules={[{ required: true }]}>
-              <Input
-                suffix={
-                  <Tooltip title="更新密钥">
-                    <RedoOutlined style={{ color: '#fa7e23' }} onClick={() => { refreshSecret() }} />
-                  </Tooltip>
-                } />
-
+            <Form.Item label="负载比" name="loadRatio" rules={[{ required: true }]}>
+              <Input />
             </Form.Item>
-            <Form.Item label="可以使用" name="canUse" rules={[{ required: true }]}>
+            <Form.Item label="地址" name="address" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="是否启用" name="status" rules={[{ required: true }]}>
               <Select>
-                <Select.Option value={1}>是</Select.Option>
-                <Select.Option value={0}>否</Select.Option>
+                <Select.Option value={1}>启用</Select.Option>
+                <Select.Option value={0}>禁用</Select.Option>
               </Select>
+            </Form.Item>
+            <Form.Item label="主机" name="host" >
+              <Input />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit" >提交</Button>

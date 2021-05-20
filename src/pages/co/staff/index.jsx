@@ -15,6 +15,7 @@ const staffList = () => {
     const formRef = useRef();
     const treeSelectRef = useRef();
     const [treeList, setTreeList] = useState([]);
+    const [treeData, setTreeData] = useState([]);
     const [roleOption, setRoleOption] = useState([]);
     const [adjustModal, setAdjustModal] = useState({});
 
@@ -117,7 +118,7 @@ const staffList = () => {
             icon: <EditOutlined />,
             onClick: async (record) => {
                 console.log(record);
-                let permissions =  Tools.getTreeChild(record.permissionCodes, record.permissions)
+                let permissions = Tools.getTreeChild(record.permissionCodes, record.permissions)
                 Tools.logMsg(permissions)
                 await setAdjustModal({ title: '修改员工信息', disabled: true, isModalVisible: true });
                 if (record.permissions.length) {
@@ -199,7 +200,9 @@ const staffList = () => {
     useEffect(() => {
         Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
             if (result.success) {
-                setTreeList(result.data.rows)
+                let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
+                setTreeData(treeData)
+                // setTreeList(result.data.rows)
             }
         });
         Tools.callAPI('sys.role:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
@@ -239,7 +242,7 @@ const staffList = () => {
                             <Input />
                         </Form.Item>}
                         <Form.Item label="权限" name="permissions" rules={[{ required: true }]}>
-                            <GetParentTreeSelect treeList={treeList} ref={treeSelectRef} />
+                            <GetParentTreeSelect treeData={treeData} ref={treeSelectRef} />
                         </Form.Item>
                         <Form.Item label="角色" name="roleId" rules={[{ required: true }]}>
                             <Select

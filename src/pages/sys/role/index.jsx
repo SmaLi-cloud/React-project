@@ -12,7 +12,7 @@ const RoleList = (props) => {
   const table = useRef();
   const formRef = useRef();
   const treeSelectRef = useRef();
-  const [treeList, setTreeList] = useState([]);
+  const [treeData, setTreeData] = useState([]);
   const [staffData, setStaffData] = useState([]);
   const [adjustModal, setAdjustModal] = useState({});
   const searchs = [
@@ -27,15 +27,13 @@ const RoleList = (props) => {
       dataSource: [],
     },
     {
-      title: '权限编码',
+      title: '拥有权限',
       dataIndex: '',
       key: 'permissions',
-      type: 'input',
+      type: 'treeSelect',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
-    },
+      dataSource: treeData
+    }
   ];
   const columns = [
     {
@@ -190,9 +188,10 @@ const RoleList = (props) => {
   useEffect(() => {
     Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
-        setTreeList(result.data.rows)
+          let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
+          setTreeData(treeData)
       }
-    });
+  });
   }, []);
   return (
     <>
@@ -217,7 +216,7 @@ const RoleList = (props) => {
               <Input />
             </Form.Item>
             <Form.Item label="权限" name="permissions" rules={[{ required: true }]} >
-              <GetParentTreeSelect treeList={treeList} ref={treeSelectRef} />
+            <GetParentTreeSelect treeData={treeData} ref={treeSelectRef} />
             </Form.Item>
             <Form.Item label="员工" name="staffIds">
               <SearchSelect onChange={(val) => {}}  options={staffData} />

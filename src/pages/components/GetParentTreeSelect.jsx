@@ -46,12 +46,10 @@ class getParentTreeSelect extends React.Component {
     Tools.logMsg(result)
   }
   componentDidMount() {
-    let treeList = Tools.cloneDeep(this.props.treeList)
-    // Tools.logMsg(treeList)
-    // Tools.callAPI('sys.permission:search', { "conditions": {} }, this.successCallBack, this.errorCallBack)
-    this.rows = Tools.buildTree(treeList, 'id', 'parentId', 'children', "")
+    let treeData = Tools.cloneDeep(this.props.treeData)
+    this.rows = treeData;
     this.setState({ treeData: this.rows ,value: this.props.initTreeValue })
-    // Tools.logMsg('渲染')
+
   }
 
   render() {

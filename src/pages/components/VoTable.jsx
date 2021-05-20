@@ -135,6 +135,8 @@ class VoTable extends React.Component {
                     element = <Input value={defaultValue} style={{ width: '100%' }} />
                 } else if (this.props.searchs[i].type == 'treeSelect') {
                     element = <TreeSelect value={defaultValue} treeData={this.props.searchs[i].dataSource} style={{ width: '100%' }} />
+                }else if (this.props.searchs[i].type == 'select') {
+                    element = <Select value={defaultValue} style={{ width: '100%' }} options={this.props.searchs[i].dataSource} />
                 }
                 children.push(
                     <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>

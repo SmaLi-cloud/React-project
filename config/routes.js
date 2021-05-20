@@ -25,7 +25,7 @@ export default [
                 redirect: '/login',
               },
               {
-                path:'/cus',
+                path: '/cus',
                 name: 'cus',
                 icon: 'crown',
                 authority: ['cus'],
@@ -39,7 +39,7 @@ export default [
                 ],
               },
               {
-                path:'/co',
+                path: '/co',
                 name: 'co',
                 icon: 'crown',
                 authority: ['co'],
@@ -50,7 +50,6 @@ export default [
                     component: './co/staff',
                     authority: ['co.staff'],
                   },
-                  
                 ],
               },
               {
@@ -93,10 +92,21 @@ export default [
                     component: './sys/sysConfig',
                     authority: ['sys.sys_config'],
                   },
-
+                  {
+                    path: '/sys/emqxServer',
+                    name: 'emqxServer',
+                    component: './sys/emqxServer',
+                    authority: ['sys.emqx_server'],
+                  },
+                  {
+                    path: '/sys/apiServer',
+                    name: 'apiServerList',
+                    component: './sys/apiServerList',
+                    authority: ['sys.api_server_list'],
+                  },
                 ],
               },
-              
+
               {
                 component: './404',
               },

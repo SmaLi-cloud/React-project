@@ -25,6 +25,20 @@ export default [
                 redirect: '/login',
               },
               {
+                path:'/cus',
+                name: 'cus',
+                icon: 'crown',
+                authority: ['cus'],
+                routes: [
+                  {
+                    path: '/cus/thirdPartySystem',
+                    name: 'thirdPartySystem',
+                    component: './cus/thirdPartySystem',
+                    authority: ['cus.third_party_system'],
+                  },
+                ],
+              },
+              {
                 path:'/co',
                 name: 'co',
                 icon: 'crown',

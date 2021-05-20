@@ -1,7 +1,7 @@
 const timeout = 5000;
 const prefix = 'http://api.workbench.vo:8080';
 const isDebug = true;
-const authority = ["co", "co.user", "co.staff","sys",'sys.permission','sys.role','sys.dictionary','sys.log','sys.sys_config'];
+const authority = ["co","sys", "cus", "co.user", "co.staff","sys.permission","sys.role","sys.dictionary","sys.log","sys.sys_config", "cus.third_party_system"];
 
 const config = {
     timeout,

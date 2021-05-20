@@ -7,13 +7,11 @@ import { EditOutlined, PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-de
 import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
+const { TextArea } = Input;
 
 const RoleList = (props) => {
   const table = useRef();
   const formRef = useRef();
-  const treeSelectRef = useRef();
-  const [treeList, setTreeList] = useState([]);
-  const [staffData, setStaffData] = useState([]);
   const [adjustModal, setAdjustModal] = useState({});
   const searchs = [
     {
@@ -29,38 +27,14 @@ const RoleList = (props) => {
   ];
   const columns = [
     {
-      title: '配置',
+      title: '配置名称',
       dataIndex: 'key',
       key: 'key',
     },
     {
-      title: '应用系统',
+      title: '配置信息',
       dataIndex: 'data',
-      key: 'version',
-      render:(tag)=>{
-        let data = Object.keys(tag);
-        return data;
-      }
-    },
-    {
-      title: '系统版本',
-      dataIndex: 'data',
-      key: 'version',
-      render:(tag)=>{
-        let data = Object.keys(tag);
-
-        return tag[data].version;
-      }
-    },
-    {
-      title: '系统地址',
-      dataIndex: 'data',
-      key: 'version',
-      render:(tag)=>{
-        let data = Object.keys(tag);
-
-        return tag[data].url;
-      }
+      key: 'data'
     },
   ];
   const paging = {
@@ -71,13 +45,12 @@ const RoleList = (props) => {
   };
   const toolBar = [
     {
-      title: '添加角色',
+      title: '添加系统',
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        await setAdjustModal({ title: '添加角色', disabled: false, isModalVisible: true })
-        await setStaffData([]);
+        await setAdjustModal({ title: '添加系统', disabled: false, isModalVisible: true })
         formRef.current.resetFields();
       },
     }
@@ -89,21 +62,8 @@ const RoleList = (props) => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        console.log(record);
-        await setAdjustModal({ title: '修改角色', disabled: true, isModalVisible: true });
-        let permissions = Tools.getTreeChild(record.permissionCodes, record.permissions)
-        if (record.permissions.length) {
-          treeSelectRef.current.state.value = permissions
-        }
-        let staffOptions = [];
-        if (record.staffIds.length) {
-          record.staffIds.forEach((v, i) => {
-            staffOptions.push({ label: record.staffNames[i], value: v })
-          })
-        }
-        await setStaffData(staffOptions);
+        await setAdjustModal({ title: '修改系统', disabled: true, isModalVisible: true });
         formRef.current.setFieldsValue({ ...record })
-
       },
       width: 100
     },
@@ -140,7 +100,6 @@ const RoleList = (props) => {
       rowKey: "id",
       bordered: true,
     },
-    // rowSelectType: 'checkbox',
     voPermission: "sys.staff.role",
   };
   const formItemLayout = {
@@ -151,18 +110,15 @@ const RoleList = (props) => {
       span: 14,
     },
   };
-  const onSaveRole = () => {
-    let addOptions = 'sys.role:save'
-    let addStaffData = formRef.current.getFieldValue();
-    if (!addStaffData.staffIds) {
-      addStaffData.staffIds = [];
-    }
-    Tools.verify('sys.vf_role', addStaffData, (result, err) => {
+  const onSaveSysConfig = () => {
+    let addOptions = 'sys.sys_config:save'
+    let addSysConfigData = formRef.current.getFieldValue();
+    Tools.verify('sys.vf_sys_config', addSysConfigData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err);
         return;
       }
-      Tools.callAPI(addOptions, { roleInfo: addStaffData }, (result) => {
+      Tools.callAPI(addOptions, { configInfo: addSysConfigData }, (result) => {
         if (result.success) {
           message.success('保存成功');
           setAdjustModal({ isModalVisible: false })
@@ -179,13 +135,6 @@ const RoleList = (props) => {
     formRef.current.resetFields();
     setAdjustModal({ isModalVisible: false })
   }
-  useEffect(() => {
-    Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
-      if (result.success) {
-        setTreeList(result.data.rows)
-      }
-    });
-  }, []);
   return (
     <>
       <PageContainer
@@ -201,18 +150,12 @@ const RoleList = (props) => {
           <Form
             ref={formRef}
             {...formItemLayout}
-            onFinish={onSaveRole} >
-            <Form.Item label="角色名称" name="name" rules={[{ required: true }]}>
+            onFinish={onSaveSysConfig} >
+            <Form.Item label="配置名称" name="key" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="描述" name="desc" rules={[{ required: true }]} >
-              <Input />
-            </Form.Item>
-            <Form.Item label="权限" name="permissions" rules={[{ required: true }]} >
-              <GetParentTreeSelect treeList={treeList} ref={treeSelectRef} />
-            </Form.Item>
-            <Form.Item label="员工" name="staffIds">
-              <SearchSelect onChange={(val) => {}}  options={staffData} />
+            <Form.Item label="系统地址" name="data">
+             <TextArea />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit" >提交</Button>

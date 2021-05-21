@@ -113,7 +113,7 @@ export default [
                   {
                     path: '/sys/device',
                     name: 'device',
-                    component: './sys/model',
+                    component: './sys/device',
                     authority: ['sys.device'],
                   },
                 ],

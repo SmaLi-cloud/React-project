@@ -24,9 +24,9 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '模组类型',
+      title: '主控型号',
       dataIndex: '',
-      key: 'modelType',
+      key: 'mainControlType',
       type: 'input',
       colSpan: 1,
       defaultValue: '',
@@ -34,7 +34,7 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '库存量',
+      title: '存储大小',
       dataIndex: '',
       key: 'storageSize',
       type: 'input',
@@ -53,12 +53,12 @@ const dictionaryList = () => {
       key: 'modelName',
     },
     {
-      title: '模组类型',
-      dataIndex: 'modelType',
-      key: 'modelType',
+      title: '主控型号',
+      dataIndex: 'mainControlType',
+      key: 'mainControlType',
     },
     {
-      title: '库存量',
+      title: '存储大小',
       dataIndex: 'storageSize',
       key: 'storageSize',
     },
@@ -164,10 +164,10 @@ const dictionaryList = () => {
             <Form.Item label="模组名称" name="modelName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="模组类型" name="modelType" rules={[{ required: true }]}>
+            <Form.Item label="主控型号" name="mainControlType" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="库存量" name="storageSize" rules={[{ required: true }]}>
+            <Form.Item label="存储大小" name="storageSize" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

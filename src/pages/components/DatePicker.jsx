@@ -32,8 +32,10 @@ const DatePickers = (props) => {
         setValue(val);
     }
     const SetDefaultValue=()=> {
-        props.onChange([moment().subtract(7, 'days'), moment()]);
-        return [moment().subtract(7, 'days'), moment()]
+        if(props.defaultTime){
+            props.onChange([moment().subtract(props.defaultTime, 'days'), moment()]);
+            return [moment().subtract(props.defaultTime, 'days'), moment()]
+        }
     }
 return (
     <RangePicker

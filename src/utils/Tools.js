@@ -437,16 +437,33 @@ function getTreeChild(oldPermissionCodes, oldPermissions) {
   let permissionCodes = cloneDeep(oldPermissionCodes);
   let permissions = cloneDeep(oldPermissions);
   for (let i = 0; i < permissionCodes.length; i++) {
-      const code = permissionCodes[i];
-      for (let j = i+1; j < permissionCodes.length; j++) {
+    const code = permissionCodes[i];
+    for (let j = i + 1; j < permissionCodes.length; j++) {
       const codeCompare = permissionCodes[j];
-          if(code.length <codeCompare.length && codeCompare.startsWith(permissionCodes[i])){
-              permissions.splice(i,1)
-              break;
-          }
+      if (code.length < codeCompare.length && codeCompare.startsWith(permissionCodes[i])) {
+        permissions.splice(i, 1);
+        break;
       }
+    }
   }
-  return permissions
+  return permissions;
+}
+
+function arrUnique(arr, key) {
+  let returnArr = [];
+  if (key) {
+    const obj = {};
+    returnArr = arr.reduce((cur, next) => {
+      obj[next[key]] ? '' : (obj[next[key]] = true && cur.push(next));
+      return cur;
+    }, []);
+    return returnArr;
+  }
+  returnArr = arr.reduce((cur, next) => {
+    !cur.includes(next) && cur.push(next);
+    return cur;
+  }, []);
+  return returnArr;
 }
 export {
   getGuid,
@@ -468,4 +485,5 @@ export {
   showMessage,
   cloneDeep,
   getTreeChild,
+  arrUnique,
 };

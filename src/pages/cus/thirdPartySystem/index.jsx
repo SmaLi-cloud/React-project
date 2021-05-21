@@ -34,7 +34,7 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '可以使用',
+      title: '是否启用',
       dataIndex: '',
       key: 'canUse',
       type: 'select',
@@ -58,7 +58,7 @@ const dictionaryList = () => {
       key: 'systemType',
     },
     {
-      title: '可以使用',
+      title: '是否启用',
       dataIndex: 'canUse',
       key: 'canUse',
       render: (record) => {
@@ -179,7 +179,6 @@ const dictionaryList = () => {
                 <Select.Option value='external'>外部</Select.Option>
                 <Select.Option value='internal'>内部</Select.Option>
               </Select>
-
             </Form.Item>
             <Form.Item label="密钥" name="secret" rules={[{ required: true }]}>
               <Input
@@ -188,9 +187,8 @@ const dictionaryList = () => {
                     <RedoOutlined style={{ color: '#fa7e23' }} onClick={() => { refreshSecret() }} />
                   </Tooltip>
                 } />
-
             </Form.Item>
-            <Form.Item label="可以使用" name="canUse" rules={[{ required: true }]}>
+            <Form.Item label="是否启用" name="canUse" rules={[{ required: true }]}>
               <Select>
                 <Select.Option value={1}>是</Select.Option>
                 <Select.Option value={0}>否</Select.Option>

@@ -199,13 +199,13 @@ const dictionaryList = () => {
             ref={formRef}
             {...formItemLayout}
             onFinish={onSaveThirdPartySystem} >
-            <Form.Item label="服务名称" name="serverName" rules={[{ required: true }]}>
+            <Form.Item label="服务器名称" name="serverName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item label="路径" name="path" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="负载比" name="loadRatio" rules={[{ required: true }]}>
+            <Form.Item label="负载比率" name="loadRatio" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item label="地址" name="address" rules={[{ required: true }]}>

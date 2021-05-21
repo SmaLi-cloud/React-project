@@ -31,7 +31,7 @@ const staffList = () => {
             dataSource: [],
         },
         {
-            title: '电话',
+            title: '手机号码',
             dataIndex: '',
             key: 'phone',
             type: 'input',
@@ -49,7 +49,7 @@ const staffList = () => {
             width: 150
         },
         {
-            title: '电话',
+            title: '手机号码',
             dataIndex: 'phone',
             key: 'phone',
             width: 120
@@ -241,10 +241,10 @@ const staffList = () => {
                         {adjustModal.disabled ? null : <Form.Item label="密码" name="password" rules={[{ required: true }]}>
                             <Input />
                         </Form.Item>}
-                        <Form.Item label="权限" name="permissions" rules={[{ required: true }]}>
+                        <Form.Item label="权限" name="permissions">
                             <GetParentTreeSelect treeData={treeData} ref={treeSelectRef} />
                         </Form.Item>
-                        <Form.Item label="角色" name="roleId" rules={[{ required: true }]}>
+                        <Form.Item label="角色" name="roleId">
                             <Select
                                 mode="multiple"
                                 allowClear
@@ -254,16 +254,16 @@ const staffList = () => {
                                 {roleOption}
                             </Select>
                         </Form.Item>
-                        <Form.Item label="电话" name="phone" rules={[{ required: true }]}>
+                        <Form.Item label="手机号码" name="phone" rules={[{ required: true }]}>
                             <Input />
                         </Form.Item>
-                        <Form.Item label="状态" name="status" rules={[{ required: true }]}>
+                        <Form.Item label="员工状态" name="status" rules={[{ required: true }]}>
                             <Select>
                                 <Option value={0}>离职</Option>
                                 <Option value={1}>在职</Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item label="账号" name="enable" rules={[{ required: true }]}>
+                        <Form.Item label="是否启用" name="enable" rules={[{ required: true }]}>
                             <Select>
                                 <Option value={0}>账号禁用</Option>
                                 <Option value={1}>账号启用</Option>

@@ -212,7 +212,7 @@ const RoleList = (props) => {
             <Form.Item label="角色名称" name="name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="描述" name="desc" rules={[{ required: true }]} >
+            <Form.Item label="描述" name="desc">
               <Input />
             </Form.Item>
             <Form.Item label="权限" name="permissions" rules={[{ required: true }]} >

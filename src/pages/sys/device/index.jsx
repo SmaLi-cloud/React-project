@@ -10,13 +10,15 @@ const dictionaryList = () => {
 
   const table = useRef();
   const formRef = useRef();
-  const [adjustModal, setAdjustModal] = useState({});
-
+  const [adjustModal, setAdjustModal] = useState({ isModalVisible: false, nameType: {} });
+  const [thirdPartySystemOptions, setThirdPartySystemOptions] = useState([]);
+  const [deviceTypeOptions, setDeviceTypeOptions] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
   const searchs = [
     {
-      title: '模组名称',
+      title: '设备名称',
       dataIndex: '',
-      key: 'modelName',
+      key: 'deviceName',
       type: 'input',
       colSpan: 1,
       defaultValue: "",
@@ -24,43 +26,109 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '模组类型',
+      title: '设备编码',
       dataIndex: '',
-      key: 'modelType',
+      key: 'deviceId',
       type: 'input',
       colSpan: 1,
+      defaultValue: "",
+      placeholder: "",
+      dataSource: [],
+    },
+    {
+      title: '设备产品类型',
+      dataIndex: '',
+      key: 'deviceType',
+      type: 'select',
+      colSpan: 1,
+      defaultValue: '',
+      placeholder: "",
+      dataSource: deviceTypeOptions,
+    },
+    {
+      title: '用户名',
+      dataIndex: '',
+      key: 'username',
+      type: 'input',
+      colSpan: 1,
+      defaultValue: "",
+      placeholder: "",
+      dataSource: [],
+    },
+    {
+      title: '第三方管理',
+      dataIndex: '',
+      key: 'thirdPartySystemId',
+      type: 'select',
+      colSpan: 1,
+      defaultValue: "",
+      placeholder: "",
+      dataSource: thirdPartySystemOptions,
+    },
+    {
+      title: '模组名称',
+      dataIndex: '',
+      key: 'modelId',
+      type: 'select',
+      colSpan: 1,
+      defaultValue: "",
+      placeholder: "",
+      dataSource: modelOptions,
+    },
+    {
+      title: '添加时间',
+      dataIndex: '',
+      key: 'addTime',
+      type: 'DatePicker',
+      colSpan: 2,
       defaultValue: '',
       placeholder: "",
       dataSource: [],
     },
     {
-      title: '库存量',
+      title: '激活时间',
       dataIndex: '',
-      key: 'storageSize',
-      type: 'input',
-      colSpan: 1,
-      defaultValue: "",
+      key: 'activationTime',
+      type: 'DatePicker',
+      colSpan: 2,
+      defaultValue: '',
       placeholder: "",
       dataSource: [],
-    },
-
-
+    }
   ];
   const columns = [
+    {
+      title: '设备名称',
+      dataIndex: 'deviceName',
+      key: 'deviceName',
+    },
     {
       title: '模组名称',
       dataIndex: 'modelName',
       key: 'modelName',
     },
     {
-      title: '模组类型',
-      dataIndex: 'modelType',
-      key: 'modelType',
+      title: '设备产品类型名',
+      dataIndex: 'deviceTypeName',
+      key: 'deviceTypeName',
     },
     {
-      title: '库存量',
-      dataIndex: 'storageSize',
-      key: 'storageSize',
+      title: '第三方管理名称',
+      dataIndex: 'thirdPartySystemName',
+      key: 'thirdPartySystemName',
+    },
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      key: 'username',
+      sorter: true
+
+    },
+    {
+      title: '添加时间',
+      dataIndex: 'addTime',
+      key: 'addTime',
+      sorter: true
     },
   ];
   const paging = {
@@ -71,16 +139,50 @@ const dictionaryList = () => {
   };
   const toolBar = [
     {
-      title: '添加模组',
+      title: '单次添加设备',
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        await setAdjustModal({ title: '添加模组', disabled: false, isModalVisible: true });
+        await setAdjustModal(
+          {
+            title: '添加设备',
+            disabled: false,
+            isModalVisible: true,
+            multiple: false,
+            nameType: { deviceId: 'deviceId', username: 'username', password: 'password' },
+          });
         // formRef.current.resetFields();
         let guid = Tools.getGuid();
         let record = { secret: guid }
         formRef.current.setFieldsValue({ ...record })
+      },
+    },
+    {
+      title: '批量添加设备',
+      type: 'primary',
+      key: 'addBatch',
+      icon: <PlusOutlined />,
+      onClick: async () => {
+        await setAdjustModal({
+          title: '批量设备',
+          disabled: false,
+          isModalVisible: true,
+          multiple: true,
+          nameType: { deviceId: 'deviceIdPrefix', username: 'usernamePrefix', password: 'passwordPrefix', }
+        });
+        // formRef.current.resetFields();
+        let guid = Tools.getGuid();
+        let record = { secret: guid }
+        formRef.current.setFieldsValue({ ...record })
+      },
+    },
+    {
+      title: '上传文件',
+      type: 'primary',
+      key: 'upload',
+      icon: <PlusOutlined />,
+      onClick: async () => {
       },
     }
   ];
@@ -91,7 +193,13 @@ const dictionaryList = () => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        await setAdjustModal({ title: '修改模组', disabled: true, isModalVisible: true });
+        await setAdjustModal({
+          title: '修改设备',
+          disabled: true,
+          isModalVisible: true,
+          multiple: false,
+          nameType: { deviceId: 'deviceId', username: 'username', password: 'password', }
+        });
         Tools.logMsg(record)
         formRef.current.setFieldsValue({ ...record })
       },
@@ -104,12 +212,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.model:search',
+    dataSource: 'sys.device:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.model",
+    voPermission: "sys.device",
   };
   const formItemLayout = {
     labelCol: {
@@ -119,19 +227,20 @@ const dictionaryList = () => {
       span: 14,
     },
   };
-  const onSaveModel = () => {
-    let addOptions = 'sys.model:save'
-    let addModelData = formRef.current.getFieldValue();
-    Tools.logMsg(addModelData)
-    Tools.verify('sys.vf_model', addModelData, (result, err) => {
+  const onSaveDevice = () => {
+    let addOptions = adjustModal.multiple ? 'sys.device:save_batch' : 'sys.device:save'
+    let verify = adjustModal.multiple ? 'sys.vf_device_batch' : 'sys.vf_device'
+    let addDeviceData = formRef.current.getFieldValue();
+    Tools.logMsg(addDeviceData)
+    Tools.verify(verify, addDeviceData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err);
         return;
       }
-      Tools.callAPI(addOptions, { modelInfo: addModelData }, (result) => {
+      Tools.callAPI(addOptions, { deviceInfo: addDeviceData }, (result) => {
         if (result.success) {
           message.success('保存成功');
-          setAdjustModal({ isModalVisible: false })
+          closeModal();
           table.current.refreshData()
         } else if (!result.success) {
           Tools.showMessage('保存失败', result.msg);
@@ -143,13 +252,41 @@ const dictionaryList = () => {
   }
   const closeModal = () => {
     formRef.current.resetFields();
-    setAdjustModal({ isModalVisible: false })
+    setAdjustModal({ isModalVisible: false, nameType: {} })
   }
+  useEffect(() => {
+    Tools.callAPI('cus.third_party_system:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+      if (result.success) {
+        let options = result.data.rows.map((v, i) => {
+          return { label: v.fullName, value: v.id }
+        })
+        setThirdPartySystemOptions(options)
+      }
+    });
+    Tools.callAPI('sys.device:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+      if (result.success) {
+        let options = result.data.rows.map((v, i) => {
+          return { label: v.deviceTypeName, value: v.deviceType }
+        })
+        options = Tools.arrUnique(options, 'value')
+        setDeviceTypeOptions(options)
+      }
+    });
+    Tools.callAPI('sys.model:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+
+      if (result.success) {
+        let options = result.data.rows.map((v, i) => {
+          return { label: v.modelName, value: v.id }
+        })
+        setModelOptions(options)
+      }
+    });
+  }, []);
   return (
     <>
       <PageContainer
         header={{
-          title: '模组管理',
+          title: '设备管理',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
@@ -160,16 +297,41 @@ const dictionaryList = () => {
           <Form
             ref={formRef}
             {...formItemLayout}
-            onFinish={onSaveModel} >
-            <Form.Item label="模组名称" name="modelName" rules={[{ required: true }]}>
+            onFinish={onSaveDevice} >
+            <Form.Item label="设备名称" name="deviceName">
               <Input />
             </Form.Item>
-            <Form.Item label="模组类型" name="modelType" rules={[{ required: true }]}>
+            <Form.Item label={adjustModal.multiple ? "设备编码前缀" : "设备编码"} name={adjustModal.nameType.deviceId} rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="库存量" name="storageSize" rules={[{ required: true }]}>
+            <Form.Item label={adjustModal.multiple ? "用户名前缀" : "用户名"} name={adjustModal.nameType.username} rules={[{ required: true }]}>
               <Input />
             </Form.Item>
+            {
+              adjustModal.disabled ?
+                null : <Form.Item label={adjustModal.multiple ? "密码前缀" : "密码"} name={adjustModal.nameType.password} rules={[{ required: true }]}>
+                  <Input />
+                </Form.Item>
+            }
+            <Form.Item label="设备产品类型" name="deviceType" rules={[{ required: true }]}>
+              <Select options={deviceTypeOptions} />
+            </Form.Item>
+            <Form.Item label="模组名称" name="modelId" rules={[{ required: true }]}>
+              <Select options={modelOptions} />
+            </Form.Item>
+            <Form.Item label="第三方管理" name="thirdPartySystemId" rules={[{ required: true }]}>
+              <Select options={thirdPartySystemOptions} />
+            </Form.Item>
+            {adjustModal.multiple ?
+              <Form.Item label="个数" name="count" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item> : null
+            }
+            {adjustModal.multiple ?
+              <Form.Item label="起始值" name="start" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item> : null
+            }
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit" >提交</Button>
               <Button type="primary" className={styles.btnCancel} onClick={closeModal}>取消</Button>

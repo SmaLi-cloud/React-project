@@ -41,6 +41,7 @@ const dictionaryList = () => {
       colSpan: 2,
       defaultValue: '',
       placeholder: "",
+      defaultTime:7,
       dataSource: [],
     }
   ];

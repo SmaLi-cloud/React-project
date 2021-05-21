@@ -3,6 +3,7 @@ import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import moment from 'moment';
+import Upload from '@/pages/components/Upload';
 import DatePickers from './DatePicker'
 import styles from './VoTable.less'
 const { RangePicker } = DatePicker;
@@ -115,7 +116,6 @@ class VoTable extends React.Component {
         }
         return columns;
     }
-
     getSearchForm() {
         const children = [];
         let element;
@@ -130,12 +130,12 @@ class VoTable extends React.Component {
                 }
                 if (this.props.searchs[i].type == 'DatePicker') {
                     // transfer onChange Make the form get DatePickers value
-                    element = <DatePickers onChange={(val) =>{}} />
+                    element = <DatePickers onChange={(val) => { }} defaultTime={this.props.searchs[i].defaultTime} />
                 } else if (this.props.searchs[i].type == 'input') {
                     element = <Input value={defaultValue} style={{ width: '100%' }} />
                 } else if (this.props.searchs[i].type == 'treeSelect') {
                     element = <TreeSelect value={defaultValue} treeData={this.props.searchs[i].dataSource} style={{ width: '100%' }} />
-                }else if (this.props.searchs[i].type == 'select') {
+                } else if (this.props.searchs[i].type == 'select') {
                     element = <Select value={defaultValue} style={{ width: '100%' }} options={this.props.searchs[i].dataSource} />
                 }
                 children.push(
@@ -163,9 +163,17 @@ class VoTable extends React.Component {
                 if (children.length == 0) {
                     children.push(<Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} key={v.key} onClick={v.onClick} icon={v.icon}>{v.title}</Button>);
                 } else {
-                    children.push(
-                        <Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
-                    )
+                    if (v.key == 'upload') {
+                        children.push(
+                            <Upload />
+                        )
+
+                    } else {
+                        children.push(
+                            <Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
+                        )
+                    }
+
                 }
             });
         }
@@ -195,7 +203,9 @@ class VoTable extends React.Component {
         };
         if (this.state.sorter) {
             searchConditions["order"] = {};
-            searchConditions["order"][this.state.sorter["field"]] = (this.state.sorter["order"] == "descend" ? -1 : 1);
+            if (this.state.sorter["field"]) {
+                searchConditions["order"][this.state.sorter["field"]] = (this.state.sorter["order"] == "ascend" ? 1 : -1);
+            }
         }
         return searchConditions;
     }

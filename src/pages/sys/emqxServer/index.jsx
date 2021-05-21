@@ -223,7 +223,7 @@ const dictionaryList = () => {
             ref={formRef}
             {...formItemLayout}
             onFinish={onSaveThirdPartySystem} >
-            <Form.Item label="服务名称" name="serverName" rules={[{ required: true }]}>
+            <Form.Item label="服务器名称" name="serverName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item label="应用Id" name="appId" rules={[{ required: true }]}>
@@ -235,7 +235,7 @@ const dictionaryList = () => {
             <Form.Item label="内网IP" name="intranetIp" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="公用IP" name="publicIp" rules={[{ required: true }]}>
+            <Form.Item label="公网IP" name="publicIp" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item label="是否启用" name="status" rules={[{ required: true }]}>

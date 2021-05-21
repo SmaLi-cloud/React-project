@@ -14,9 +14,9 @@ const dictionaryList = () => {
 
   const searchs = [
     {
-      title: '名称',
+      title: '模组名称',
       dataIndex: '',
-      key: 'fullName',
+      key: 'modelName',
       type: 'input',
       colSpan: 1,
       defaultValue: "",
@@ -24,9 +24,9 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '系统类型',
+      title: '模组类型',
       dataIndex: '',
-      key: 'systemType',
+      key: 'modelType',
       type: 'input',
       colSpan: 1,
       defaultValue: '',
@@ -34,37 +34,33 @@ const dictionaryList = () => {
       dataSource: [],
     },
     {
-      title: '可以使用',
+      title: '库存量',
       dataIndex: '',
-      key: 'canUse',
-      type: 'select',
+      key: 'storageSize',
+      type: 'input',
       colSpan: 1,
       defaultValue: "",
       placeholder: "",
-      dataSource: [{ label: "", value: '' }, { label: "是", value: "1" }, { label: "否", value: "0" }],
+      dataSource: [],
     },
 
 
   ];
   const columns = [
     {
-      title: '名称',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      title: '模组名称',
+      dataIndex: 'modelName',
+      key: 'modelName',
     },
     {
-      title: '系统类型',
-      dataIndex: 'systemType',
-      key: 'systemType',
+      title: '模组类型',
+      dataIndex: 'modelType',
+      key: 'modelType',
     },
     {
-      title: '可以使用',
-      dataIndex: 'canUse',
-      key: 'canUse',
-      render: (record) => {
-        return record ? "是" : "否";
-
-      }
+      title: '库存量',
+      dataIndex: 'storageSize',
+      key: 'storageSize',
     },
   ];
   const paging = {
@@ -75,12 +71,12 @@ const dictionaryList = () => {
   };
   const toolBar = [
     {
-      title: '添加第三方系统',
+      title: '添加模组',
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        await setAdjustModal({ title: '添加第三方系统', disabled: false, isModalVisible: true });
+        await setAdjustModal({ title: '添加模组', disabled: false, isModalVisible: true });
         // formRef.current.resetFields();
         let guid = Tools.getGuid();
         let record = { secret: guid }
@@ -95,7 +91,7 @@ const dictionaryList = () => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        await setAdjustModal({ title: '修改第三方系统', disabled: true, isModalVisible: true });
+        await setAdjustModal({ title: '修改模组', disabled: true, isModalVisible: true });
         Tools.logMsg(record)
         formRef.current.setFieldsValue({ ...record })
       },
@@ -108,12 +104,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'cus.third_party_system:search',
+    dataSource: 'sys.model:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "cus.third_party_system",
+    voPermission: "sys.model",
   };
   const formItemLayout = {
     labelCol: {
@@ -123,16 +119,16 @@ const dictionaryList = () => {
       span: 14,
     },
   };
-  const onSaveThirdPartySystem = () => {
-    let addOptions = 'cus.third_party_system:save'
-    let addThirdPartySystemData = formRef.current.getFieldValue();
-    Tools.logMsg(addThirdPartySystemData)
-    Tools.verify('cus.vf_third_party_system', addThirdPartySystemData, (result, err) => {
+  const onSaveModel = () => {
+    let addOptions = 'sys.model:save'
+    let addModelData = formRef.current.getFieldValue();
+    Tools.logMsg(addModelData)
+    Tools.verify('sys.vf_model', addModelData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err);
         return;
       }
-      Tools.callAPI(addOptions, { thirdPartySystemInfo: addThirdPartySystemData }, (result) => {
+      Tools.callAPI(addOptions, { modelInfo: addModelData }, (result) => {
         if (result.success) {
           message.success('保存成功');
           setAdjustModal({ isModalVisible: false })
@@ -149,17 +145,11 @@ const dictionaryList = () => {
     formRef.current.resetFields();
     setAdjustModal({ isModalVisible: false })
   }
-  const refreshSecret = () => {
-    let sysConfigData = formRef.current.getFieldValue();
-    sysConfigData.secret = Tools.getGuid();
-    formRef.current.resetFields(); //touch render
-    formRef.current.setFieldsValue({ ...sysConfigData })
-  }
   return (
     <>
       <PageContainer
         header={{
-          title: '日志文件',
+          title: '模组管理',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
@@ -170,31 +160,15 @@ const dictionaryList = () => {
           <Form
             ref={formRef}
             {...formItemLayout}
-            onFinish={onSaveThirdPartySystem} >
-            <Form.Item label="系统名称" name="fullName" rules={[{ required: true }]}>
+            onFinish={onSaveModel} >
+            <Form.Item label="模组名称" name="modelName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="系统类型" name="systemType" rules={[{ required: true }]}>
-              <Select>
-                <Select.Option value='external'>外部</Select.Option>
-                <Select.Option value='internal'>内部</Select.Option>
-              </Select>
-
+            <Form.Item label="模组类型" name="modelType" rules={[{ required: true }]}>
+              <Input />
             </Form.Item>
-            <Form.Item label="密钥" name="secret" rules={[{ required: true }]}>
-              <Input
-                suffix={
-                  <Tooltip title="更新密钥">
-                    <RedoOutlined style={{ color: '#fa7e23' }} onClick={() => { refreshSecret() }} />
-                  </Tooltip>
-                } />
-
-            </Form.Item>
-            <Form.Item label="可以使用" name="canUse" rules={[{ required: true }]}>
-              <Select>
-                <Select.Option value={1}>是</Select.Option>
-                <Select.Option value={0}>否</Select.Option>
-              </Select>
+            <Form.Item label="库存量" name="storageSize" rules={[{ required: true }]}>
+              <Input />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit" >提交</Button>

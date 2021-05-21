@@ -27,7 +27,7 @@ export default [
               {
                 path: '/cus',
                 name: 'cus',
-                icon: 'crown',
+                icon: 'user',
                 authority: ['cus'],
                 routes: [
                   {
@@ -104,9 +104,20 @@ export default [
                     component: './sys/apiServerList',
                     authority: ['sys.api_server_list'],
                   },
+                  {
+                    path: '/sys/model',
+                    name: 'model',
+                    component: './sys/model',
+                    authority: ['sys.model'],
+                  },
+                  {
+                    path: '/sys/device',
+                    name: 'device',
+                    component: './sys/model',
+                    authority: ['sys.device'],
+                  },
                 ],
               },
-
               {
                 component: './404',
               },

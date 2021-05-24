@@ -1,0 +1,60 @@
+
+import { Upload, message, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { logMsg, callAPI, showMessage } from '@/utils/tools';
+import React, { useState, useRef, useEffect } from 'react';
+
+
+
+
+const dictionaryList = (v) => {
+
+    const [uploading, setUploading] = useState(false);
+    const [fileName, setFileName] = useState('');
+
+    const uploadProps = {
+        showUploadList: false,
+        maxCount: 1,
+        customRequest(info) {
+            logMsg(v)
+            setUploading(true);
+            setFileName(info.file.name)
+            const reader = new FileReader();
+            reader.readAsDataURL(info.file);
+            reader.onload = function () {
+                if (reader.readyState == 2) {
+                    let baseData = reader.result.split('base64,')[1];
+                    logMsg(reader.result)
+                    callAPI('sys.device:excel_import', { fileContent: baseData }, (result) => {
+                        logMsg(result)
+                        if (result.success && result.data.importResult) {
+                        } else {
+                            let url = 'http://api.workbench.vo:8080';
+                            url = url + result.data.errorXls;
+                            showMessage('上传失败', '点击确定,下载错误文件', function () {
+                                location.href = url;
+                            });
+                        }
+                        setFileName('');
+                        setUploading(false);
+
+                    });
+                }
+            };
+        },
+        beforeUpload(file) {
+        }
+    };
+
+    return (
+        <>
+            <Upload {...uploadProps}>
+                <Button loading={uploading} type={v.propsValue.type} key={v.propsValue.key} icon={<UploadOutlined />} style={v.style}>{uploading ? '上传中' : '上传文件'} </Button>
+            </Upload>
+            <span>{fileName}</span>
+        </>
+
+    );
+};
+
+export default dictionaryList;

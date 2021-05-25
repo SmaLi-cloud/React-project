@@ -1,4 +1,4 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, TreeSelect, Input, Button, message, notification } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -16,8 +16,8 @@ const tableList = () => {
   useEffect(() => {
     Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
-        let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
-        setTreeData(treeData)
+        // let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
+        setTreeData(result.data.rows)
       }
     });
   }, []);
@@ -47,7 +47,7 @@ const tableList = () => {
             message.success('删除成功');
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -90,24 +90,24 @@ const tableList = () => {
   const searchs = [
     {
       title: '名称',
-      dataIndex: '',
       key: 'name',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],//string，[]
-      //取数据的方式
-    }, {
+    },
+    {
       title: '父权限',
-      dataIndex: '',
       key: 'parentId',
-      type: 'treeSelect',
+      type: 'VoTreeSelect',
       colSpan: 1,
-      dataSource: treeData
-    }, {
+      dataSource: treeData,
+      widthParentId: false,
+      keyFiledName: "id",
+      parentFiledName: "parentId",
+      rootParentValue: "",
+      treeCheckable: false
+    },
+    {
       title: '权限编码',
-      dataIndex: '',
       key: 'code',
       type: 'input',
       colSpan: 1,
@@ -127,7 +127,7 @@ const tableList = () => {
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
-      onClick: async (dataSource) => {
+      onClick: async () => {
         await setAdjustModal({ title: '添加权限', disabled: false, isModalVisible: true })
         formRef.current.resetFields();
       },
@@ -141,7 +141,7 @@ const tableList = () => {
     let permissionData = formRef.current.getFieldValue();
     Tools.verify('sys.vf_permission', permissionData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { permissionInfo: permissionData }, (result) => {
@@ -150,7 +150,7 @@ const tableList = () => {
           setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

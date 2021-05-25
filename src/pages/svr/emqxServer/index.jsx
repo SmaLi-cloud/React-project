@@ -1,4 +1,4 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button, Tooltip } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, RedoOutlined } from '@ant-design/icons';
@@ -15,32 +15,34 @@ const dictionaryList = () => {
   const searchs = [
     {
       title: '服务名称',
-      dataIndex: '',
       key: 'serverName',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
-      title: '路径',
-      dataIndex: '',
-      key: 'path',
+      title: '内网IP',
+      key: 'intranetIp',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
+    },
+    {
+      title: '公共IP',
+      key: 'publicIp',
+      type: 'input',
+      colSpan: 1,
+    },
+    {
+      title: '是否在线',
+      key: 'isOnline',
+      type: 'select',
+      colSpan: 1,
+      dataSource: [{ label: "在线", value: 1 }, { label: "离线", value: 0 }],
     },
     {
       title: '是否启用',
-      dataIndex: '',
       key: 'status',
       type: 'select',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
       dataSource: [{ label: "启用", value: "1" }, { label: "禁用", value: "0" }],
     },
   ];
@@ -51,19 +53,27 @@ const dictionaryList = () => {
       key: 'serverName',
     },
     {
-      title: '路径',
-      dataIndex: 'path',
-      key: 'path',
+      title: '连接数量',
+      dataIndex: 'connectCount',
+      key: 'connectCount',
     },
     {
-      title: '负载比',
-      dataIndex: 'loadRatio',
-      key: 'loadRatio',
+      title: '内网IP',
+      dataIndex: 'intranetIp',
+      key: 'intranetIp',
     },
     {
-      title: '地址',
-      dataIndex: 'address',
-      key: 'address',
+      title: '是否在线',
+      dataIndex: 'isOnline',
+      key: 'isOnline',
+      render: (record) => {
+        return record ? "在线" : "离线";
+      }
+    },
+    {
+      title: '公共IP',
+      dataIndex: 'publicIp',
+      key: 'publicIp',
     },
     {
       title: '是否启用',
@@ -72,11 +82,6 @@ const dictionaryList = () => {
       render: (record) => {
         return record ? "启用" : "禁用";
       }
-    },
-    {
-      title: '主机',
-      dataIndex: 'host',
-      key: 'host',
     },
   ];
   const paging = {
@@ -87,13 +92,14 @@ const dictionaryList = () => {
   };
   const toolBar = [
     {
-      title: '添加API服务',
+      title: '添加MQTT服务',
       type: 'primary',
       key: 'add',
       icon: <PlusOutlined />,
       onClick: async () => {
-        await setAdjustModal({ title: '添加API服务', disabled: false, isModalVisible: true });
+        await setAdjustModal({ title: '添加MQTT服务', disabled: false, isModalVisible: true });
         formRef.current.resetFields();
+
       },
     }
   ];
@@ -104,8 +110,7 @@ const dictionaryList = () => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        await setAdjustModal({ title: '修改API服务', disabled: true, isModalVisible: true });
-        Tools.logMsg(record)
+        await setAdjustModal({ title: '修改MQTT服务', disabled: true, isModalVisible: true });
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
@@ -116,16 +121,16 @@ const dictionaryList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        let deleteOptions = 'sys.api_server_list:delete'
-        let deletApiServerListData = {};
-        deletApiServerListData.apiServerListId = record.id;
-        Tools.callAPI(deleteOptions, deletApiServerListData, (result) => {
+        let deleteOptions = 'sys.emqx_server:delete'
+        let deletEmqxServerData = {};
+        deletEmqxServerData.emqxServerId = record.id;
+        Tools.callAPI(deleteOptions, deletEmqxServerData, (result) => {
           Tools.logMsg(result)
           if (result.success) {
             message.success('删除成功');
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -141,12 +146,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.api_server_list:search',
+    dataSource: 'sys.emqx_server:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.api_server_list",
+    voPermission: "sys.emqx_server",
   };
   const formItemLayout = {
     labelCol: {
@@ -157,21 +162,20 @@ const dictionaryList = () => {
     },
   };
   const onSaveThirdPartySystem = () => {
-    let addOptions = 'sys.api_server_list:save'
-    let addApiServerListData = formRef.current.getFieldValue();
-    Tools.logMsg(addApiServerListData)
-    Tools.verify('sys.vf_api_server_list', addApiServerListData, (result, err) => {
+    let addOptions = 'sys.emqx_server:save'
+    let addEmqxServerData = formRef.current.getFieldValue();
+    Tools.verify('sys.vf_emqx_server', addEmqxServerData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
-      Tools.callAPI(addOptions, { apiServerListInfo: addApiServerListData }, (result) => {
+      Tools.callAPI(addOptions, { emqxServerInfo: addEmqxServerData }, (result) => {
         if (result.success) {
           message.success('保存成功');
           setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);
@@ -182,12 +186,11 @@ const dictionaryList = () => {
     formRef.current.resetFields();
     setAdjustModal({ isModalVisible: false })
   }
-
   return (
     <>
       <PageContainer
         header={{
-          title: 'API服务',
+          title: 'MQTT服务',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
@@ -202,13 +205,16 @@ const dictionaryList = () => {
             <Form.Item label="服务器名称" name="serverName" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="路径" name="path" rules={[{ required: true }]}>
+            <Form.Item label="应用Id" name="appId" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="负载比率" name="loadRatio" rules={[{ required: true }]}>
+            <Form.Item label="应用Key" name="appKey" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item label="地址" name="address" rules={[{ required: true }]}>
+            <Form.Item label="内网IP" name="intranetIp" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="公网IP" name="publicIp" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item label="是否启用" name="status" rules={[{ required: true }]}>
@@ -216,9 +222,6 @@ const dictionaryList = () => {
                 <Select.Option value={1}>启用</Select.Option>
                 <Select.Option value={0}>禁用</Select.Option>
               </Select>
-            </Form.Item>
-            <Form.Item label="主机" name="host" >
-              <Input />
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit" >提交</Button>

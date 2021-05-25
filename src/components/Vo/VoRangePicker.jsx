@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DatePicker } from 'antd';
 import moment from 'moment';
+import { logMsg } from '@/utils/tools';
 const { RangePicker } = DatePicker;
 
 const VoRangePicker = (props) => {
@@ -21,7 +22,14 @@ const VoRangePicker = (props) => {
     const onChange = (val) => {
         setValue(val);
         if (props.onChange) {
-            props.onChange(val);
+            let timeData = {};
+            if (val instanceof Array) {
+                timeData.start = moment(val[0]).format('YYYY-MM-DD HH:mm:ss')
+                timeData.end = moment(val[1]).format('YYYY-MM-DD HH:mm:ss')
+            } else {
+                timeData = moment(val).format('YYYY-MM-DD HH:mm:ss')
+            }
+            props.onChange(timeData);
         }
     }
     const onOpenChange = open => {
@@ -42,7 +50,23 @@ const VoRangePicker = (props) => {
         if (value && value.length) {
             return value;
         }
-        return props.value;
+        let propsValue = [];
+        if (!props.value) {
+            return propsValue;
+        }
+        if (!props.value['start']) {
+            propsValue.push(undefined);
+        }
+        else {
+            propsValue.push(moment(props.value['start'], "YYYY-MM-DD HH:mm:ss"));
+        }
+        if (!props.value['end']) {
+            propsValue.push(undefined);
+        }
+        else {
+            propsValue.push(moment(props.value['end'], "YYYY-MM-DD HH:mm:ss"));
+        }
+        return propsValue;
     }
     return (
         <RangePicker

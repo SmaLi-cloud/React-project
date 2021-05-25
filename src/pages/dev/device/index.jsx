@@ -1,13 +1,13 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button, Tooltip } from 'antd';
-import { EditOutlined, PlusOutlined, DeleteOutlined, UploadOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined, EyeOutlined, UploadOutlined, FileExcelOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
+import moment from 'moment';
 
 const dictionaryList = () => {
-
   const table = useRef();
   const formRef = useRef();
   const [adjustModal, setAdjustModal] = useState({ isModalVisible: false, nameType: {} });
@@ -155,6 +155,20 @@ const dictionaryList = () => {
       key: 'excelExport',
       icon: <FileExcelOutlined />,
       onClick: async () => {
+        let { conditions } = table.current.getSearchConditions();
+        Tools.logMsg(conditions)
+        Tools.callAPI('sys.device:excel_export', { conditions }, (result) => {
+          Tools.logMsg(result)
+          if (result.success) {
+            let url = 'http://api.workbench.vo:8080';
+            url = url + result.data.exportXls;
+            Tools.showMessage('导出文件成功', ['共导出' + result.data.eportCount + '条数据', '点击 知道了 下载Excel文件'], 'success',function () {
+            location.href = url;
+            });
+          } else {
+            Tools.showMessage('导出文件失败',result.msg,'error')
+          }
+        })
       },
     },
     {
@@ -162,17 +176,17 @@ const dictionaryList = () => {
       type: '',
       key: 'upload',
       icon: <UploadOutlined />,
-      uploadAction:'sys.device:excel_import',
-      allowFile:['xls','xlsx'],
+      uploadAction: 'sys.device:excel_import',
+      allowFile: ['xls', 'xlsx'],
       successCallback: (result) => {
         if (!result.success) {
-          showMessage('上传失败', result.msg);
+          showMessage('上传失败', result.msg, 'error');
         } else if (result.success && result.data.importResult) {
           message.success('上传文件内容添加成功');
         } else {
           let url = 'http://api.workbench.vo:8080';
           url = url + result.data.errorXls;
-          showMessage('上传失败', '点击确定,下载错误文件', function () {
+          showMessage('上传失败', '点击确定,下载错误文件', 'error', function () {
             location.href = url;
           });
         }
@@ -181,6 +195,30 @@ const dictionaryList = () => {
 
   ];
   const opCols = [
+    {
+      key: 'statusUnfold',
+      title: "状态",
+      type: "link",
+      icon: <EyeOutlined />,
+      onClick: (record) => {
+        let statusInfo = record.statusInfo;
+        if (typeof record.content !== 'string') {
+          statusInfo = JSON.stringify(statusInfo)
+        }
+        Modal.info({
+          title: '状态信息详情',
+          width: 1250,
+          height: 600,
+          content: (
+            <div>
+              {/* highLight插件 */}
+              <Input.TextArea value={statusInfo} autoSize={{ minRows: 5, maxRows: 10 }} />
+            </div>
+          ),
+        });
+      },
+      width: 100
+    },
     {
       key: 'Edit',
       title: "修改",
@@ -226,7 +264,7 @@ const dictionaryList = () => {
     let addDeviceData = formRef.current.getFieldValue();
     Tools.verify(verify, addDeviceData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { deviceInfo: addDeviceData }, (result) => {
@@ -235,7 +273,7 @@ const dictionaryList = () => {
           closeModal();
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

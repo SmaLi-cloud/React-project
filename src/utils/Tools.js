@@ -421,7 +421,7 @@ function verifyItem(key, verifyRule, data) {
   return true;
 }
 
-function showMessage(title, messages,callback) {
+function showMessage(title, messages, type, callback) {
   if (!(messages instanceof Array)) {
     messages = messages.split('\n');
   }
@@ -429,11 +429,19 @@ function showMessage(title, messages,callback) {
   messages.forEach((message, i) => {
     children.push(<div key={i}>{message}</div>);
   });
+  if(!type){
   Modal.error({
     title: title,
     content: <div>{children}</div>,
     onOk:callback
   });
+  } else {
+    Modal[type]({
+      title: title,
+        content: <div>{children}</div>,
+        onOk:callback
+    })
+  }
 }
 function cloneDeep(data) {
   return lodash.cloneDeep(data);

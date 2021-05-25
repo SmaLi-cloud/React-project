@@ -1,8 +1,8 @@
-import VoTable from '@/pages/components/VoTable';
-import VoTreeSelect from '@/pages/components/VoTreeSelect';
-import VoSearchSelect from '@/pages/components/VoSearchSelect';
+import VoTable from '@/components/Vo/VoTable';
+import VoTreeSelect from '@/components/Vo/VoTreeSelect';
+import VoSearchSelect from '@/components/Vo/VoSearchSelect';
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select, message, Input, Button } from 'antd';
+import { Modal, Form, message, Input, Button } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import styles from './index.less';
@@ -17,17 +17,12 @@ const RoleList = (props) => {
   const searchs = [
     {
       title: '名字',
-      dataIndex: '',
       key: 'name',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '拥有权限',
-      dataIndex: '',
       key: 'permissions',
       type: 'VoTreeSelect',
       colSpan: 1,
@@ -98,7 +93,6 @@ const RoleList = (props) => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
-        console.log(record);
         await setAdjustModal({ title: '修改角色', disabled: true, isModalVisible: true });
         let staffOptions = [];
         if (record.staffIds.length) {
@@ -124,7 +118,7 @@ const RoleList = (props) => {
             table.current.state.selectedRowKeys = []
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -164,7 +158,7 @@ const RoleList = (props) => {
     }
     Tools.verify('sys.vf_role', addStaffData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { roleInfo: addStaffData }, (result) => {
@@ -173,7 +167,7 @@ const RoleList = (props) => {
           setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

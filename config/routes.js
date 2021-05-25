@@ -16,7 +16,7 @@ export default [
       {
         path: '/',
         routes: [
-          {
+{
             path: '/',
             component: '../layouts/BasicLayout',
             routes: [
@@ -50,10 +50,16 @@ export default [
                     component: './co/staff',
                     authority: ['co.staff'],
                   },
+                  {
+                    path: '/co/role',
+                    name: 'role',
+                    component: './co/role',
+                    authority: ['co.role'],
+                  },
                 ],
               },
               {
-                // path:'/sys',
+                path: '/sys',
                 name: 'sys',
                 icon: 'crown',
                 authority: ['sys'],
@@ -61,30 +67,14 @@ export default [
                   {
                     path: '/sys/permission',
                     name: 'permission',
-                    icon: 'smile',
                     component: './sys/permission',
                     authority: ['sys.permission'],
                   },
                   {
                     path: '/sys/dictionary',
                     name: 'dictionary',
-                    icon: 'smile',
                     component: './sys/dictionary',
                     authority: ['sys.dictionary'],
-                  },
-                  {
-                    path: '/sys/log',
-                    name: 'log',
-                    icon: 'smile',
-                    component: './sys/log',
-                    authority: ['sys.log'],
-                  },
-
-                  {
-                    path: '/sys/role',
-                    name: 'role',
-                    component: './sys/role',
-                    authority: ['sys.role'],
                   },
                   {
                     path: '/sys/sysConfig',
@@ -92,29 +82,71 @@ export default [
                     component: './sys/sysConfig',
                     authority: ['sys.sys_config'],
                   },
+                ],
+              },
+              {
+                path: '/svr',
+                name: 'svr',
+                icon: 'crown',
+                authority: ['svr'],
+                routes: [
                   {
-                    path: '/sys/emqxServer',
+                    path: '/svr/emqxServer',
                     name: 'emqxServer',
-                    component: './sys/emqxServer',
-                    authority: ['sys.emqx_server'],
+                    component: './svr/emqxServer',
+                    authority: ['svr.emqx_server'],
                   },
                   {
-                    path: '/sys/apiServer',
+                    path: '/svr/apiServer',
                     name: 'apiServerList',
-                    component: './sys/apiServerList',
-                    authority: ['sys.api_server_list'],
+                    component: './svr/apiServerList',
+                    authority: ['svr.api_server_list'],
                   },
+                ],
+              },
+              {
+                path: '/dev',
+                name: 'dev',
+                icon: 'crown',
+                authority: ['dev'],
+                routes: [
                   {
-                    path: '/sys/model',
+                    path: '/dev/model',
                     name: 'model',
-                    component: './sys/model',
-                    authority: ['sys.model'],
+                    component: './dev/model',
+                    authority: ['dev.model'],
                   },
                   {
-                    path: '/sys/device',
+                    path: '/dev/device',
                     name: 'device',
-                    component: './sys/device',
-                    authority: ['sys.device'],
+                    component: './dev/device',
+                    authority: ['dev.device'],
+                  },
+                  {
+                    path: '/dev/deviceType',
+                    name: 'deviceType',
+                    component: './dev/deviceType',
+                    authority: ['dev.device_type'],
+                  },
+                ],
+              },
+              {
+                path: '/log',
+                name: 'log',
+                icon: 'crown',
+                authority: ['log'],
+                routes: [
+                  {
+                    path: '/log/apiLog',
+                    name: 'apiLog',
+                    component: './cus/thirdPartySystem',
+                    authority: ['log.api_log'],
+                  },
+                  {
+                    path: '/log/deviceLog',
+                    name: 'deviceLog',
+                    component: './log/deviceLog',
+                    authority: ['log.device_log'],
                   },
                 ],
               },

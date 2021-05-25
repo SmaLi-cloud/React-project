@@ -1,47 +1,36 @@
-import VoTable from '@/pages/components/VoTable';
-import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select, message, Input } from 'antd';
-import { EditOutlined, PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import VoTable from '@/components/Vo/VoTable';
+import React, { useRef } from 'react';
+import { Modal, message, Input } from 'antd';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 
-//ToDo....  日期设置一个范围，最多就是一周
-const dictionaryList = () => {
+const apiLogList = () => {
 
   const table = useRef();
 
   const searchs = [
     {
       title: '类型',
-      dataIndex: '',
       key: 'type',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: 'Ip地址',
-      dataIndex: '',
       key: 'ip',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
-
     {
       title: '请求时间',
-      dataIndex: '',
       key: 'writeTime',
       type: 'DatePicker',
       colSpan: 2,
-      defaultValue: [moment().subtract(7, 'days'), moment()],
+      defaultValue: { "start": moment().subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'), "end": moment().format('YYYY-MM-DD HH:mm:ss') },
       placeholder: '',
-      maxDayRange:7,
+      maxDayRange: 7,
     }
   ];
   const columns = [
@@ -64,7 +53,6 @@ const dictionaryList = () => {
     {
       title: '日志标题',
       dataIndex: 'title',
-      // sorter: true,
       key: 'title',
     },
     {
@@ -88,13 +76,13 @@ const dictionaryList = () => {
       needRowSelected: true,
       icon: <DeleteOutlined />,
       onClick: () => {
-        Tools.callAPI('sys.log:delete_by_ids', { ids: table.current.state.selectedRowKeys }, (result) => {
+        Tools.callAPI('sys.log:api_delete_by_ids', { ids: table.current.state.selectedRowKeys }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -105,26 +93,25 @@ const dictionaryList = () => {
   ];
   const opCols = [
     {
-      key: 'Unfold',
+      key: 'unfold',
       title: "详情",
       type: "link",
       icon: <EyeOutlined />,
-      onClick:  (record) => {
+      onClick: (record) => {
         let logContent = record.content;
-       if(typeof record.content !== 'string'){
-         logContent = JSON.stringify(logContent)
-       }
+        if (typeof record.content !== 'string') {
+          logContent = JSON.stringify(logContent)
+        }
         Modal.info({
           title: '日志信息详情',
           width: 1250,
-          height:600,
+          height: 600,
           content: (
             <div>
               {/* highLight插件 */}
-              <Input.TextArea value={logContent} autoSize={{ minRows: 5, maxRows: 10 }}/>
+              <Input.TextArea value={logContent} autoSize={{ minRows: 5, maxRows: 10 }} />
             </div>
           ),
-          onOk() { },
         });
       },
       width: 100
@@ -135,13 +122,13 @@ const dictionaryList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        Tools.callAPI('sys.log:delete', { logId: record.id }, (result) => {
+        Tools.callAPI('sys.log:api_delete', { logId: record.id }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -157,7 +144,7 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.log:search',
+    dataSource: 'sys.log:api_search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
@@ -182,4 +169,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default apiLogList;

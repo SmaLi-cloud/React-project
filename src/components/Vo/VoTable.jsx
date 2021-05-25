@@ -2,12 +2,10 @@ import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, 
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
-import moment from 'moment';
-import Upload from '@/pages/components/VoUploadBtn';
+import Upload from '@/components/Vo/VoUploadBtn';
 import VoRangePicker from './VoRangePicker'
 import styles from './VoTable.less'
-import VoTreeSelect from '@/pages/components/VoTreeSelect';
-const { RangePicker } = DatePicker;
+import VoTreeSelect from '@/components/Vo/VoTreeSelect';
 
 class VoTable extends React.Component {
 
@@ -41,9 +39,6 @@ class VoTable extends React.Component {
             }
         }
         this.formRef = React.createRef();
-    }
-    getSelectedRowKeys() {
-        return this.state.selectedRowKeys;
     }
     getColConfig() {
         let columns = this.props.columns || [];
@@ -123,16 +118,12 @@ class VoTable extends React.Component {
         let element;
         if (this.props.searchs) {
             for (let i = 0; i < this.props.searchs.length; i++) {
-                let defaultValue = "";
-                if (this.state.searchConditions.hasOwnProperty(this.props.searchs[i].key)) {
-                    defaultValue = this.state.searchConditions[this.props.searchs[i].key];
-                }
                 if (!Tools.checkUserPermission(this.props.voPermission + ".search." + this.props.searchs[i].key)) {
                     continue;
-                }
-                this.state.initialValues[this.props.searchs[i].key] = defaultValue || this.props.searchs[i].defaultValue;
+                } 
+                this.state.initialValues[this.props.searchs[i].key] = this.props.searchs[i].defaultValue;
                 if (this.props.searchs[i].type == 'DatePicker') {
-                    element = <VoRangePicker onChange={this.props.searchs[i].onChange} maxDayRange={this.props.searchs[i].maxDayRange} />
+                    element = <VoRangePicker onChange={this.props.searchs[i].onChange} maxDayRange={this.props.searchs[i].maxDayRange} type={this.props.searchs[i].type} />
                 } else if (this.props.searchs[i].type == 'input') {
                     element = <Input style={{ width: '100%' }} />
                 } else if (this.props.searchs[i].type == 'VoTreeSelect') {
@@ -180,23 +171,9 @@ class VoTable extends React.Component {
         }
         return children;
     }
-    formatSearchFormTime(timeValue) {
-        let writeTime = {}
-        if (timeValue instanceof Array) {
-            writeTime.start = moment(timeValue[0]).format('YYYY-MM-DD HH:mm:ss')
-            writeTime.end = moment(timeValue[1]).format('YYYY-MM-DD HH:mm:ss')
-        } else {
-            writeTime = moment(timeValue).format('YYYY-MM-DD HH:mm:ss')
-        }
-        this.state.searchConditions.writeTime = writeTime;
-    }
     getSearchConditions() {
         this.state.searchConditions = this.formRef.current ? this.formRef.current.getFieldValue() : [];
         this.state.searchConditions = Tools.cloneDeep(this.state.searchConditions)
-        Tools.logMsg(this.formRef.current.getFieldValue())
-        if (this.state.searchConditions.writeTime) {
-            this.formatSearchFormTime(this.state.searchConditions.writeTime)
-        }
         let searchConditions = {
             page: this.state.paging.current,
             size: this.state.paging.pageSize,
@@ -211,9 +188,7 @@ class VoTable extends React.Component {
         return searchConditions;
     }
     refreshData(current, pageSize, sorter) {
-        this.setState({ loading: true })
         if (current) {
-
             this.state.paging.current = current;
         }
         if (pageSize) {
@@ -225,7 +200,6 @@ class VoTable extends React.Component {
         }
         else {
             Tools.callAPI(this.props.dataSource, this.getSearchConditions(), (result) => {
-                this.setState({ loading: false })
                 if (result.success) {
                     Tools.logMsg(result)
                     this.dataSourceLoaded(result.data);
@@ -250,13 +224,15 @@ class VoTable extends React.Component {
         return -1;
     }
     onResetClick() {
-        this.formRef.current.resetFields();
+        this.formRef.current.resetFields()        
     };
     onSearchClick() {
         this.refreshData(1);
     };
     render() {
+        Tools.logMsg('render')
         return (
+
             <>
                 {
                     !this.getSearchForm() ? null : <Card style={{ marginBottom: 10 }}>

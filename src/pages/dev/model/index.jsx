@@ -1,4 +1,4 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button, Tooltip } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, RedoOutlined } from '@ant-design/icons';
@@ -15,36 +15,22 @@ const dictionaryList = () => {
   const searchs = [
     {
       title: '模组名称',
-      dataIndex: '',
       key: 'modelName',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '主控型号',
-      dataIndex: '',
       key: 'mainControlType',
       type: 'input',
       colSpan: 1,
-      defaultValue: '',
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '存储大小',
-      dataIndex: '',
       key: 'storageSize',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
-
-
   ];
   const columns = [
     {
@@ -77,7 +63,6 @@ const dictionaryList = () => {
       icon: <PlusOutlined />,
       onClick: async () => {
         await setAdjustModal({ title: '添加模组', disabled: false, isModalVisible: true });
-        // formRef.current.resetFields();
         let guid = Tools.getGuid();
         let record = { secret: guid }
         formRef.current.setFieldsValue({ ...record })
@@ -92,7 +77,6 @@ const dictionaryList = () => {
       icon: <EditOutlined />,
       onClick: async (record) => {
         await setAdjustModal({ title: '修改模组', disabled: true, isModalVisible: true });
-        Tools.logMsg(record)
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
@@ -122,10 +106,9 @@ const dictionaryList = () => {
   const onSaveModel = () => {
     let addOptions = 'sys.model:save'
     let addModelData = formRef.current.getFieldValue();
-    Tools.logMsg(addModelData)
     Tools.verify('sys.vf_model', addModelData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { modelInfo: addModelData }, (result) => {
@@ -134,7 +117,7 @@ const dictionaryList = () => {
           setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

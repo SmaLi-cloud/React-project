@@ -1,4 +1,4 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, Input, Button, message } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -16,23 +16,15 @@ const dictionaryList = () => {
   const searchs = [
     {
       title: '字典值',
-      dataIndex: '',
       key: 'itemName',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '字典码',
-      dataIndex: '',
       key: 'typeCode',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
   ];
   const columns = [
@@ -99,13 +91,12 @@ const dictionaryList = () => {
         let deleteDictionaryData = {};
         deleteDictionaryData.dictionaryId = record.id;
         Tools.callAPI(deleteOptions, deleteDictionaryData, (result) => {
-          debugger
           Tools.logMsg(result)
           if (result.success) {
             message.success('删除成功');
             table.current.refreshData()
           } else if (!result.success) {
-            Tools.showMessage('删除失败', result.msg);
+            Tools.showMessage('删除失败', result.msg, 'error');
             return;
           }
         }, (result) => {
@@ -169,10 +160,9 @@ const dictionaryList = () => {
   const onSaveDictionary = () => {
     let addOptions = 'sys.dictionary:save'
     let dictionaryData = formRef.current.getFieldValue();
-    console.log(formRef.current.getFieldValue())
     Tools.verify('sys.vf_dictionary', dictionaryData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { dictionaryInfo: dictionaryData }, (result) => {
@@ -182,7 +172,7 @@ const dictionaryList = () => {
 
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

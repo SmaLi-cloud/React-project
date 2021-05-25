@@ -1,5 +1,5 @@
-import VoTable from '@/pages/components/VoTable';
-import VoTreeSelect from '@/pages/components/VoTreeSelect';
+import VoTable from '@/components/Vo/VoTable';
+import VoTreeSelect from '@/components/Vo/VoTreeSelect';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -14,7 +14,6 @@ const staffList = () => {
     const table = useRef();
     const formRef = useRef();
     const treeSelectRef = useRef();
-    const [treeList, setTreeList] = useState([]);
     const [treeData, setTreeData] = useState([]);
     const [roleOption, setRoleOption] = useState([]);
     const [adjustModal, setAdjustModal] = useState({});
@@ -22,23 +21,15 @@ const staffList = () => {
     const searchs = [
         {
             title: '员工姓名',
-            dataIndex: '',
             key: 'trueName',
             type: 'input',
             colSpan: 1,
-            defaultValue: "",
-            placeholder: "",
-            dataSource: [],
         },
         {
             title: '手机号码',
-            dataIndex: '',
             key: 'phone',
             type: 'input',
             colSpan: 1,
-            defaultValue: "",
-            placeholder: "",
-            dataSource: [],
         },
     ];
     const columns = [
@@ -117,9 +108,7 @@ const staffList = () => {
             type: "link",
             icon: <EditOutlined />,
             onClick: async (record) => {
-                console.log(record);
                 let permissions = Tools.getTreeChild(record.permissionCodes, record.permissions)
-                Tools.logMsg(permissions)
                 await setAdjustModal({ title: '修改员工信息', disabled: true, isModalVisible: true });
                 if (record.permissions.length) {
                     treeSelectRef.current.state.value = permissions
@@ -140,7 +129,7 @@ const staffList = () => {
                         table.current.state.selectedRowKeys = []
                         table.current.refreshData()
                     } else if (!result.success) {
-                        Tools.showMessage('删除失败', result.msg);
+                        Tools.showMessage('删除失败', result.msg, 'error');
                         return;
                     }
                 }, (result) => {
@@ -161,7 +150,6 @@ const staffList = () => {
             rowKey: "id",
             bordered: true,
         },
-        // rowSelectType: 'checkbox',
         voPermission: "co.staff",
     };
     const formItemLayout = {
@@ -181,7 +169,7 @@ const staffList = () => {
         let addStaffData = formRef.current.getFieldValue();
         Tools.verify('co.vf_staff', addStaffData, (result, err) => {
             if (!result) {
-                Tools.showMessage('保存失败', err);
+                Tools.showMessage('保存失败', err, 'error');
                 return;
             }
             Tools.callAPI(addOptions, { staffInfo: addStaffData }, (result) => {
@@ -190,7 +178,7 @@ const staffList = () => {
                     setAdjustModal({ isModalVisible: false })
                     table.current.refreshData()
                 } else if (!result.success) {
-                    Tools.showMessage('保存失败', result.msg);
+                    Tools.showMessage('保存失败', result.msg, 'error');
                 }
             }, (result) => {
                 console.log(result);
@@ -202,7 +190,6 @@ const staffList = () => {
             if (result.success) {
                 let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
                 setTreeData(treeData)
-                // setTreeList(result.data.rows)
             }
         });
         Tools.callAPI('sys.role:search', { conditions: {}, page: 1, size: 10000 }, (result) => {

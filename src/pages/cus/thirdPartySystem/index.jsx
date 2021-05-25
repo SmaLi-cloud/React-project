@@ -1,4 +1,4 @@
-import VoTable from '@/pages/components/VoTable';
+import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button, Tooltip } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, RedoOutlined } from '@ant-design/icons';
@@ -12,36 +12,23 @@ const dictionaryList = () => {
   const searchs = [
     {
       title: '名称',
-      dataIndex: '',
       key: 'fullName',
       type: 'input',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '系统类型',
-      dataIndex: '',
       key: 'systemType',
       type: 'input',
       colSpan: 1,
-      defaultValue: '',
-      placeholder: "",
-      dataSource: [],
     },
     {
       title: '是否启用',
-      dataIndex: '',
       key: 'canUse',
       type: 'select',
       colSpan: 1,
-      defaultValue: "",
-      placeholder: "",
-      dataSource: [ { label: "是", value: "1" }, { label: "否", value: "0" }],
+      dataSource: [{ label: "是", value: "1" }, { label: "否", value: "0" }],
     },
-
-
   ];
   const columns = [
     {
@@ -78,7 +65,6 @@ const dictionaryList = () => {
       icon: <PlusOutlined />,
       onClick: async () => {
         await setAdjustModal({ title: '添加第三方系统', disabled: false, isModalVisible: true });
-        // formRef.current.resetFields();
         let guid = Tools.getGuid();
         let record = { secret: guid }
         formRef.current.setFieldsValue({ ...record })
@@ -93,7 +79,6 @@ const dictionaryList = () => {
       icon: <EditOutlined />,
       onClick: async (record) => {
         await setAdjustModal({ title: '修改第三方系统', disabled: true, isModalVisible: true });
-        Tools.logMsg(record)
         formRef.current.setFieldsValue({ ...record })
       },
       width: 100
@@ -123,10 +108,9 @@ const dictionaryList = () => {
   const onSaveThirdPartySystem = () => {
     let addOptions = 'cus.third_party_system:save'
     let addThirdPartySystemData = formRef.current.getFieldValue();
-    Tools.logMsg(addThirdPartySystemData)
     Tools.verify('cus.vf_third_party_system', addThirdPartySystemData, (result, err) => {
       if (!result) {
-        Tools.showMessage('保存失败', err);
+        Tools.showMessage('保存失败', err, 'error');
         return;
       }
       Tools.callAPI(addOptions, { thirdPartySystemInfo: addThirdPartySystemData }, (result) => {
@@ -135,7 +119,7 @@ const dictionaryList = () => {
           setAdjustModal({ isModalVisible: false })
           table.current.refreshData()
         } else if (!result.success) {
-          Tools.showMessage('保存失败', result.msg);
+          Tools.showMessage('保存失败', result.msg, 'error');
         }
       }, (result) => {
         console.log(result);

@@ -1,7 +1,6 @@
 import React from 'react'
 import * as Tools from '@/utils/tools'
-import { Card, TreeSelect, Button, Modal, Form, Input } from 'antd';
-import { set } from 'lodash';
+import { TreeSelect } from 'antd';
 
 class VoTreeSelect extends React.Component {
   constructor(props) {
@@ -10,20 +9,25 @@ class VoTreeSelect extends React.Component {
   }
   onChange = value => {
     if (this.props.onChange) {
-      let selectedIds = new Set();
-      if (!(value instanceof Array)) {
-        value = [value];
-      }
-      value.forEach((v, i) => {
-        selectedIds.add(v);
-        if (this.props.widthParentId) {
-          const parents = Tools.getTreeParent(this.buildTreeDate, "children", this.props.parentFiledName, this.props.keyFiledName, v)
-          if (parents) {
-            selectedIds.add(...parents);
-          }
+      if (value instanceof Array) {
+        let selectedIds = new Set();
+        if (!(value instanceof Array)) {
+          value = [value];
         }
-      });
-      this.props.onChange(Array.from(selectedIds));
+        value.forEach((v, i) => {
+          selectedIds.add(v);
+          if (this.props.widthParentId) {
+            const parents = Tools.getTreeParent(this.buildTreeDate, "children", this.props.parentFiledName, this.props.keyFiledName, v)
+            if (parents) {
+              selectedIds.add(...parents);
+            }
+          }
+        });
+        this.props.onChange(Array.from(selectedIds));
+      }
+      else {
+        this.props.onChange(value);
+      }
     }
   };
   dropParents() {

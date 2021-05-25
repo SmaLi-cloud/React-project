@@ -15,7 +15,7 @@ const VoUpload = (props) => {
             let fileName = info.file.name.split('.')[info.file.name.split('.').length - 1];
             if (props.allowFile) {
                 if (!fileName || props.allowFile.indexOf(fileName) == -1) {
-                    showMessage('上传格式错误', '请选择上传扩展名为' + props.allowFile + '的文件!');
+                    showMessage('上传格式错误', '请选择上传扩展名为' + props.allowFile + '的文件!','error');
                     return;
                 }
             }
@@ -37,9 +37,14 @@ const VoUpload = (props) => {
                     });
                 }
             };
+            reader.onerror = function () {
+                showMessage('文件读取失败', '文件读取失败，请重新上传文件！','error');
+                setFileName('');
+                setUploading(false);
+            }
         },
     };
-
+    
     return (
         <>
             <Upload {...uploadProps}>

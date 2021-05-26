@@ -1,13 +1,12 @@
 import VoTable from '@/components/Vo/VoTable';
 import React, { useState, useRef, useEffect } from 'react';
-import { Modal, Form, Select, message, Input, Button, Tooltip } from 'antd';
-import { EditOutlined, PlusOutlined, EyeOutlined, UploadOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Modal, Form, Select, message, Input, Button } from 'antd';
+import { EditOutlined, PlusOutlined, EyeOutlined, UploadOutlined, FileExcelOutlined, RotateRightOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
-import moment from 'moment';
-
-const dictionaryList = () => {
+import config from '@/utils/config.js';
+const deviceList = () => {
   const table = useRef();
   const formRef = useRef();
   const [adjustModal, setAdjustModal] = useState({ isModalVisible: false, nameType: {} });
@@ -157,11 +156,10 @@ const dictionaryList = () => {
       onClick: async () => {
         let { conditions } = table.current.getSearchConditions();
         Tools.logMsg(conditions)
-        Tools.callAPI('sys.device:excel_export', { conditions }, (result) => {
+        Tools.callAPI('dev.device:excel_export', { conditions }, (result) => {
           Tools.logMsg(result)
           if (result.success) {
-            let url = 'http://api.workbench.vo:8080';
-            url = url + result.data.exportXls;
+            let url = config.prefix + result.data.exportXls;
             Tools.showMessage('导出文件成功', ['共导出' + result.data.eportCount + '条数据', '点击 知道了 下载Excel文件'], 'success',function () {
             location.href = url;
             });
@@ -176,7 +174,7 @@ const dictionaryList = () => {
       type: '',
       key: 'upload',
       icon: <UploadOutlined />,
-      uploadAction: 'sys.device:excel_import',
+      uploadAction: 'dev.device:excel_import',
       allowFile: ['xls', 'xlsx'],
       successCallback: (result) => {
         if (!result.success) {
@@ -184,8 +182,7 @@ const dictionaryList = () => {
         } else if (result.success && result.data.importResult) {
           message.success('上传文件内容添加成功');
         } else {
-          let url = 'http://api.workbench.vo:8080';
-          url = url + result.data.errorXls;
+          let url = config.prefix + result.data.errorXls;
           showMessage('上传失败', '点击确定,下载错误文件', 'error', function () {
             location.href = url;
           });
@@ -197,7 +194,7 @@ const dictionaryList = () => {
   const opCols = [
     {
       key: 'statusUnfold',
-      title: "状态",
+      title: "状态信息",
       type: "link",
       icon: <EyeOutlined />,
       onClick: (record) => {
@@ -217,7 +214,7 @@ const dictionaryList = () => {
           ),
         });
       },
-      width: 100
+      width: 110
     },
     {
       key: 'Edit',
@@ -236,6 +233,17 @@ const dictionaryList = () => {
       },
       width: 100
     },
+    {
+      key: 'log',
+      title: "日志",
+      type: "link",
+      icon: <RotateRightOutlined />,
+      onClick: async (record) => {
+       Tools.logMsg(record)
+       location.href = '/log/deviceLog?deviceId='+record.deviceId
+      },
+      width: 100
+    },
   ]
   const tableConfig = {
     columns,
@@ -243,12 +251,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.device:search',
+    dataSource: 'dev.device:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.device",
+    voPermission: "dev.device.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -259,8 +267,8 @@ const dictionaryList = () => {
     },
   };
   const onSaveDevice = () => {
-    let addOptions = adjustModal.multiple ? 'sys.device:save_batch' : 'sys.device:save'
-    let verify = adjustModal.multiple ? 'sys.vf_device_batch' : 'sys.vf_device'
+    let addOptions = adjustModal.multiple ? 'dev.device:save_batch' : 'dev.device:save'
+    let verify = adjustModal.multiple ? 'dev.vf_device_batch' : 'dev.vf_device'
     let addDeviceData = formRef.current.getFieldValue();
     Tools.verify(verify, addDeviceData, (result, err) => {
       if (!result) {
@@ -293,7 +301,7 @@ const dictionaryList = () => {
         setThirdPartySystemOptions(options)
       }
     });
-    Tools.callAPI('sys.model:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+    Tools.callAPI('dev.model:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
         let options = result.data.rows.map((v, i) => {
           return { label: v.modelName, value: v.id }
@@ -301,7 +309,7 @@ const dictionaryList = () => {
         setModelOptions(options)
       }
     });
-    Tools.callAPI('sys.device_type:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+    Tools.callAPI('dev.device_type:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
         let options = result.data.rows.map((v, i) => {
           return { label: v.typeName, value: v.id }
@@ -316,7 +324,7 @@ const dictionaryList = () => {
         header={{
           title: '设备管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '硬件管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -371,4 +379,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default deviceList;

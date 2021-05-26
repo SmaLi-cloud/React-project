@@ -2,7 +2,7 @@ import VoTable from '@/components/Vo/VoTable';
 import VoTreeSelect from '@/components/Vo/VoTreeSelect';
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Form, Select, message, Input, Button } from 'antd';
-import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined, DeleteOutlined, SettingOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
@@ -108,11 +108,7 @@ const staffList = () => {
             type: "link",
             icon: <EditOutlined />,
             onClick: async (record) => {
-                let permissions = Tools.getTreeChild(record.permissionCodes, record.permissions)
                 await setAdjustModal({ title: '修改员工信息', disabled: true, isModalVisible: true });
-                if (record.permissions.length) {
-                    treeSelectRef.current.state.value = permissions
-                }
                 formRef.current.setFieldsValue({ ...record })
             },
             width: 100
@@ -121,6 +117,8 @@ const staffList = () => {
             key: 'delete',
             title: "删除",
             type: "link",
+            needConfirm: true,
+            confirmMsg: "确定要删除么？",
             icon: <DeleteOutlined />,
             onClick: function (record) {
                 Tools.callAPI('co.staff:delete', { staffId: record.id }, (result) => {
@@ -134,10 +132,33 @@ const staffList = () => {
                     }
                 }, (result) => {
                     Tools.logMsg(result);
+                    Tools.showMessage('删除失败');
                 })
             },
             width: 100
-        }
+        },
+
+        {
+            key: 'reset_password',
+            title: "重置密码",
+            type: "link",
+            tipMsg: "密码将会重置为手机号后6位",
+            needConfirm: true,
+            confirmMsg: "确定要重置么？",
+            icon: <SettingOutlined />,
+            onClick: function (record) {
+                Tools.callAPI('co.staff:reset_password', { staffId: record.id }, (result) => {
+                    if (result.success) {
+                        message.success('密码重置成功');
+                    } else if (!result.success) {
+                        Tools.showMessage('密码重置失败', result.msg, 'error');
+                    }
+                }, (result) => {
+                    Tools.logMsg(result)
+                })
+            },
+            width: 110
+        },
     ]
     const tableConfig = {
         columns,
@@ -150,7 +171,7 @@ const staffList = () => {
             rowKey: "id",
             bordered: true,
         },
-        voPermission: "co.staff",
+        voPermission: "co.staff.list",
     };
     const formItemLayout = {
         labelCol: {
@@ -188,11 +209,10 @@ const staffList = () => {
     useEffect(() => {
         Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
             if (result.success) {
-                let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
-                setTreeData(treeData)
+                setTreeData(result.data.rows);
             }
         });
-        Tools.callAPI('sys.role:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
+        Tools.callAPI('co.role:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
             if (result.success) {
                 const children = [];
                 for (let i = 0; i < result.data.rows.length; i++) {
@@ -229,7 +249,7 @@ const staffList = () => {
                             <Input />
                         </Form.Item>}
                         <Form.Item label="权限" name="permissions">
-                            <VoTreeSelect treeData={treeData} ref={treeSelectRef} />
+                            <VoTreeSelect treeData={treeData} widthParentId={true} keyFiledName="id" parentFiledName="parentId" rootParentValue="" treeCheckable={true} />
                         </Form.Item>
                         <Form.Item label="角色" name="roleId">
                             <Select

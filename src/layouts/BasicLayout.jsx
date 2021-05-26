@@ -1,8 +1,3 @@
-/**
- * Ant Design Pro v4 use `@ant-design/pro-layout` to handle Layout.
- *
- * @see You can view component api by: https://github.com/ant-design/ant-design-pro-layout
- */
 import ProLayout, { DefaultFooter } from '@ant-design/pro-layout';
 import React, { useMemo, useRef, useState } from 'react';
 import { Link, useIntl, history } from 'umi';
@@ -11,7 +6,7 @@ import { Result, Button, Spin } from 'antd';
 import { Authorized } from '@/utils/setMenuAuthority';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { getMatchMenu } from '@umijs/route-utils';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
 import * as Tools from '@/utils/tools';
 
 const noMatch = (
@@ -43,7 +38,7 @@ const defaultFooterDom = (
       {
         key: 'github',
         title: <GithubOutlined />,
-        href: 'https://github.com/SmaLi-cloud/React-project',
+        // href: '',
         blankTarget: true,
       }
     ]}
@@ -77,11 +72,12 @@ const BasicLayout = (props) => {
   return (
     <Spin spinning={isShowMask}>
       <ProLayout
+        title="物联网管理平台"
         logo={logo}
         formatMessage={formatMessage}
         {...props}
         {...settings}
-        onMenuHeaderClick={() => history.push('/')}
+        // onMenuHeaderClick={() => history.push('/')}
         menuItemRender={(menuItemProps, defaultDom) => {
           if (
             menuItemProps.isUrl ||

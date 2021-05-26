@@ -5,7 +5,7 @@ import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, RedoOut
 import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
-const dictionaryList = () => {
+const thirdPartySystemList = () => {
   const table = useRef();
   const formRef = useRef();
   const [adjustModal, setAdjustModal] = useState({});
@@ -19,8 +19,9 @@ const dictionaryList = () => {
     {
       title: '系统类型',
       key: 'systemType',
-      type: 'input',
+      type: 'select',
       colSpan: 1,
+      dataSource: [{ label: "内部", value: "internal" }, { label: "外部", value: "external" }],
     },
     {
       title: '是否启用',
@@ -40,6 +41,14 @@ const dictionaryList = () => {
       title: '系统类型',
       dataIndex: 'systemType',
       key: 'systemType',
+      render: (data) => {
+        if (data == 'external') {
+          return '外部'
+        }
+        if (data == 'internal') {
+          return '内部'
+        }
+      }
     },
     {
       title: '是否启用',
@@ -95,7 +104,7 @@ const dictionaryList = () => {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "cus.third_party_system",
+    voPermission: "cus.third_party_system.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -140,9 +149,9 @@ const dictionaryList = () => {
     <>
       <PageContainer
         header={{
-          title: '日志文件',
+          title: '第三方系统管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '客户管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -186,4 +195,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default thirdPartySystemList;

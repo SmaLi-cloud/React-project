@@ -9,7 +9,7 @@ import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
 const { TextArea } = Input;
 
-const RoleList = (props) => {
+const sysConfigList = (props) => {
   const table = useRef();
   const formRef = useRef();
   const [adjustModal, setAdjustModal] = useState({});
@@ -96,7 +96,7 @@ const RoleList = (props) => {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.staff.role",
+    voPermission: "sys.sys_config.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -135,7 +135,7 @@ const RoleList = (props) => {
     <>
       <PageContainer
         header={{
-          title: '系统配置',
+          title: '系统配置管理',
           breadcrumb: {
             routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
           }
@@ -164,4 +164,4 @@ const RoleList = (props) => {
   );
 };
 
-export default RoleList;
+export default sysConfigList;

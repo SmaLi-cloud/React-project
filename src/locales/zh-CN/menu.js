@@ -6,7 +6,7 @@ export default {
   'menu.dev': "硬件管理",
   'menu.log': "日志管理",
   'menu.dev.device': "设备管理",
-  'menu.dev.deviceType': "设备管理",
+  'menu.dev.deviceType': "产品类型管理",
   'menu.dev.model': "模组管理",
   'menu.svr.emqxServer': "MQTT服务器管理",
   'menu.svr.apiServerList': "API服务器管理",

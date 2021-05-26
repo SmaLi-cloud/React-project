@@ -16,32 +16,18 @@ export default [
       {
         path: '/',
         routes: [
-{
+          {
             path: '/',
             component: '../layouts/BasicLayout',
             routes: [
               {
                 path: '/',
-                redirect: '/login',
+                redirect: '/user/login',
               },
-              {
-                path: '/cus',
-                name: 'cus',
-                icon: 'user',
-                authority: ['cus'],
-                routes: [
-                  {
-                    path: '/cus/thirdPartySystem',
-                    name: 'thirdPartySystem',
-                    component: './cus/thirdPartySystem',
-                    authority: ['cus.third_party_system'],
-                  },
-                ],
-              },
+              
               {
                 path: '/co',
                 name: 'co',
-                icon: 'crown',
                 authority: ['co'],
                 routes: [
                   {
@@ -61,7 +47,6 @@ export default [
               {
                 path: '/sys',
                 name: 'sys',
-                icon: 'crown',
                 authority: ['sys'],
                 routes: [
                   {
@@ -85,29 +70,21 @@ export default [
                 ],
               },
               {
-                path: '/svr',
-                name: 'svr',
-                icon: 'crown',
-                authority: ['svr'],
+                path: '/cus',
+                name: 'cus',
+                authority: ['cus'],
                 routes: [
                   {
-                    path: '/svr/emqxServer',
-                    name: 'emqxServer',
-                    component: './svr/emqxServer',
-                    authority: ['svr.emqx_server'],
-                  },
-                  {
-                    path: '/svr/apiServer',
-                    name: 'apiServerList',
-                    component: './svr/apiServerList',
-                    authority: ['svr.api_server_list'],
+                    path: '/cus/thirdPartySystem',
+                    name: 'thirdPartySystem',
+                    component: './cus/thirdPartySystem',
+                    authority: ['cus.third_party_system'],
                   },
                 ],
               },
               {
                 path: '/dev',
                 name: 'dev',
-                icon: 'crown',
                 authority: ['dev'],
                 routes: [
                   {
@@ -131,15 +108,34 @@ export default [
                 ],
               },
               {
+                path: '/svr',
+                name: 'svr',
+                authority: ['svr'],
+                routes: [
+                  {
+                    path: '/svr/emqxServer',
+                    name: 'emqxServer',
+                    component: './svr/emqxServer',
+                    authority: ['svr.emqx_server'],
+                  },
+                  {
+                    path: '/svr/apiServer',
+                    name: 'apiServerList',
+                    component: './svr/apiServerList',
+                    authority: ['svr.api_server_list'],
+                  },
+                ],
+              },
+              
+              {
                 path: '/log',
                 name: 'log',
-                icon: 'crown',
                 authority: ['log'],
                 routes: [
                   {
                     path: '/log/apiLog',
                     name: 'apiLog',
-                    component: './cus/thirdPartySystem',
+                    component: './log/apiLog',
                     authority: ['log.api_log'],
                   },
                   {

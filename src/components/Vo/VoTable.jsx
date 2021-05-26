@@ -1,4 +1,4 @@
-import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Alert, TreeSelect, Popconfirm } from 'antd';
+import { Table, Card, Form, Input, Button, Row, Col, Space, DatePicker, Select, Alert, Tooltip, Popconfirm } from 'antd';
 import React from 'react';
 import { SearchOutlined, RedoOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
@@ -54,27 +54,7 @@ class VoTable extends React.Component {
                 if (index >= 0 && permissionNode.length == 2) {
                     columns.splice(index, 1);
                 }
-                else if (index >= 0 && permissionNode.length == 3) {
-                    if (permissionNode[1] == "opCols") {
-                        let operationIndex = this.getObjIndex(opCols, 'key', permissionNode[2]);
-                        if (operationIndex >= 0) opCols.splice(operationIndex, 1);
-                    }
-                }
             }
-            if (permissionNode[0] == "search") {
-                const index = this.getObjIndex(searchs, 'key', permissionNode[1]);
-                if (index >= 0 && permissionNode.length == 2) {
-                    searchs.splice(index, 1);
-                }
-            }
-            if (permissionNode[0] == "toolBar") {
-                for (let i = 0; i < toolBar.length; i++) {
-                    if (toolBar[i] == permissionNode[1]) {
-                        toolBar.splice(i, 1)
-                    }
-                }
-            }
-
         }
         let opCols = this.props.opCols || [];
         let newOpCols = [];
@@ -85,7 +65,7 @@ class VoTable extends React.Component {
                 opWidth += opCols[i].width ? opCols[i].width : 100;
             }
         }
-        if (opCols.length) {
+        if (newOpCols.length) {
             let attribute = {
                 title: "操作",
                 fixed: 'right',
@@ -93,18 +73,18 @@ class VoTable extends React.Component {
                 width: opWidth,
                 render: (_, record) => {
                     const operations = [];
-                    opCols.forEach((v, i) => {
-                        if (v.key == "delete") {
-                            operations.push(
-                                <Popconfirm title="确定要删除么？" okText="是" cancelText="否" key={v.key} onConfirm={() => { v.onClick(record) }}>
-                                    <Button type={v.type} icon={v.icon}>{v.title}</Button>
-                                </Popconfirm>
-                            )
-                        } else if (v.key == "edit") {
-                            operations.push(<Button onClick={() => { v.onClick(record, this.state.dataSource); }} type={v.type} key={v.key} icon={v.icon}>{v.title}</Button>);
-                        } else {
-                            operations.push(<Button onClick={function () { v.onClick(record); }} type={v.type} key={v.key} icon={v.icon}>{v.title}</Button>);
+                    newOpCols.forEach((v, i) => {
+                        let operation;
+                        if (v.needConfirm) {
+                            operation = <Popconfirm title={v.confirmMsg} okText="是" cancelText="否" key={v.key} onConfirm={() => { v.onClick(record) }}><Button type={v.type} icon={v.icon}>{v.title}</Button></Popconfirm>;
                         }
+                        else {
+                            operation = <Button onClick={function () { v.onClick(record); }} type={v.type} key={v.key} icon={v.icon}>{v.title}</Button>;
+                        }
+                        if (v.tipMsg) {
+                            operation = <Tooltip placement="bottomLeft" title={v.tipMsg} key={v.key} >{operation}</Tooltip>
+                        }
+                        operations.push(operation);
                     })
                     return operations;
                 },
@@ -120,7 +100,7 @@ class VoTable extends React.Component {
             for (let i = 0; i < this.props.searchs.length; i++) {
                 if (!Tools.checkUserPermission(this.props.voPermission + ".search." + this.props.searchs[i].key)) {
                     continue;
-                } 
+                }
                 this.state.initialValues[this.props.searchs[i].key] = this.props.searchs[i].defaultValue;
                 if (this.props.searchs[i].type == 'DatePicker') {
                     element = <VoRangePicker onChange={this.props.searchs[i].onChange} maxDayRange={this.props.searchs[i].maxDayRange} type={this.props.searchs[i].type} />
@@ -129,11 +109,18 @@ class VoTable extends React.Component {
                 } else if (this.props.searchs[i].type == 'VoTreeSelect') {
                     element = <VoTreeSelect widthParentId={false} treeData={this.props.searchs[i].dataSource} style={{ width: '100%' }} keyFiledName={this.props.searchs[i].keyFiledName} rootParentValue={this.props.searchs[i].rootParentValue} parentFiledName={this.props.searchs[i].parentFiledName} />
                 } else if (this.props.searchs[i].type == 'select') {
-                    element = <Select style={{ width: '100%' }} options={this.props.searchs[i].dataSource} />
+                    if (typeof this.props.searchs[i].defaultValue == 'undefined') {
+                        this.state.initialValues[this.props.searchs[i].key] = '';
+                    }
+                    element = <Select style={{ width: '100%' }} options={[{ label: '全部', value: '' }, ...this.props.searchs[i].dataSource]} />
                 }
                 children.push(
                     <Col span={this.props.searchs[i].colSpan * 6} key={this.props.searchs[i].key}>
                         <Form.Item
+                            labelAlign='right'
+                            labelCol={{
+                                span: 6 / this.props.searchs[i].colSpan,
+                            }}
                             name={this.props.searchs[i].key}
                             label={this.props.searchs[i].title}
                         >
@@ -224,7 +211,7 @@ class VoTable extends React.Component {
         return -1;
     }
     onResetClick() {
-        this.formRef.current.resetFields()        
+        this.formRef.current.resetFields()
     };
     onSearchClick() {
         this.refreshData(1);

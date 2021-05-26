@@ -117,8 +117,7 @@ const dictionaryList = () => {
       rowKey: "id",
       bordered: true,
     },
-    // rowSelectType: 'checkbox',
-    voPermission: "sys.staff.dictionary",
+    voPermission: "sys.staff.dictionary.list",
   };
   const formItemLayout = {
     labelCol: {

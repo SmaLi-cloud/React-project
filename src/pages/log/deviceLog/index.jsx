@@ -1,29 +1,37 @@
 import VoTable from '@/components/Vo/VoTable';
-import React, { useRef, useState ,useEffect } from 'react';
-import { Modal, message, Input } from 'antd';
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import React, { useRef, useState, useEffect } from 'react';
 import * as Tools from '@/utils/tools';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 
-const apiLogList = () => {
+const deviceLogList = () => {
 
   const table = useRef();
   const [thirdPartySystemOptions, setThirdPartySystemOptions] = useState([]);
 
+  const getDeviceId = () => {
+    if (location.search) {
+      let params = Tools.getUrlParams()
+      if (params.deviceId) {
+        return params.deviceId;
+      }
+    }
+    return "";
+  };
   const searchs = [
     {
       title: '设备编码',
       key: 'deviceId',
       type: 'input',
       colSpan: 1,
+      defaultValue: getDeviceId()
     },
     {
       title: '第三方系统',
       key: 'accountId',
       type: 'select',
       colSpan: 1,
-      dataSource:thirdPartySystemOptions
+      dataSource: thirdPartySystemOptions
     },
     {
       title: '发送时间',
@@ -31,7 +39,6 @@ const apiLogList = () => {
       type: 'DatePicker',
       colSpan: 2,
       defaultValue: { "start": moment().subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'), "end": moment().format('YYYY-MM-DD HH:mm:ss') },
-      placeholder: '',
       maxDayRange: 7,
     }
   ];
@@ -75,43 +82,17 @@ const apiLogList = () => {
     total: 0,
     pageSizeOptions: [10, 20, 50, 100]
   };
-  const opCols = [
-    // {
-    //   key: 'Unfold',
-    //   title: "详情",
-    //   type: "link",
-    //   icon: <EyeOutlined />,
-    //   onClick: (record) => {
-    //     let logContent = record.cmd;
-    //     if (typeof record.content !== 'string') {
-    //       logContent = JSON.stringify(logContent)
-    //     }
-    //     Modal.info({
-    //       title: '日志信息详情',
-    //       width: 1250,
-    //       height: 600,
-    //       content: (
-    //         <div>
-    //           {/* highLight插件 */}
-    //           <Input.TextArea value={logContent} autoSize={{ minRows: 5, maxRows: 10 }} />
-    //         </div>
-    //       ),
-    //     });
-    //   },
-    //   width: 100
-    // },
-  ]
+
   const tableConfig = {
     columns,
     paging,
     searchs,
-    opCols,
-    dataSource: 'sys.log:device_search',
+    dataSource: 'log.log:device_search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.log",
+    voPermission: "log.device_log.list",
   };
   useEffect(() => {
     Tools.callAPI('cus.third_party_system:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
@@ -127,9 +108,9 @@ const apiLogList = () => {
     <>
       <PageContainer
         header={{
-          title: '设备日志',
+          title: '设备日志管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '日志管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -139,4 +120,4 @@ const apiLogList = () => {
   );
 };
 
-export default apiLogList;
+export default deviceLogList;

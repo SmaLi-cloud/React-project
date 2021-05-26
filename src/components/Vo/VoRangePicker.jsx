@@ -70,6 +70,7 @@ const VoRangePicker = (props) => {
     }
     return (
         <RangePicker
+            placeholder=""
             showTime
             style={{ width: '100%' }}
             disabledDate={disabledDate}

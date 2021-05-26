@@ -6,7 +6,7 @@ import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
 
-const dictionaryList = () => {
+const apiServerList = () => {
 
   const table = useRef();
   const formRef = useRef();
@@ -30,6 +30,7 @@ const dictionaryList = () => {
       key: 'status',
       type: 'select',
       colSpan: 1,
+      defaultValue:'',
       dataSource: [{ label: "启用", value: "1" }, { label: "禁用", value: "0" }],
     },
   ];
@@ -104,7 +105,7 @@ const dictionaryList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        let deleteOptions = 'sys.api_server_list:delete'
+        let deleteOptions = 'svr.api_server_list:delete'
         let deletApiServerListData = {};
         deletApiServerListData.apiServerListId = record.id;
         Tools.callAPI(deleteOptions, deletApiServerListData, (result) => {
@@ -129,12 +130,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.api_server_list:search',
+    dataSource: 'svr.api_server_list:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.api_server_list",
+    voPermission: "svr.api_server_list.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -145,9 +146,9 @@ const dictionaryList = () => {
     },
   };
   const onSaveThirdPartySystem = () => {
-    let addOptions = 'sys.api_server_list:save'
+    let addOptions = 'svr.api_server_list:save'
     let addApiServerListData = formRef.current.getFieldValue();
-    Tools.verify('sys.vf_api_server_list', addApiServerListData, (result, err) => {
+    Tools.verify('svr.vf_api_server_list', addApiServerListData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err,'error');
         return;
@@ -173,9 +174,9 @@ const dictionaryList = () => {
     <>
       <PageContainer
         header={{
-          title: 'API服务',
+          title: 'API服务器管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '接口服务管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -217,4 +218,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default apiServerList;

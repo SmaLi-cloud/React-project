@@ -61,7 +61,7 @@ const deviceTypeList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        let deleteOptions = 'sys.device_type:delete'
+        let deleteOptions = 'dev.device_type:delete'
         let delDeviceTypeData = {};
         delDeviceTypeData.deviceTypeId = record.id;
         Tools.callAPI(deleteOptions, delDeviceTypeData, (result) => {
@@ -86,12 +86,12 @@ const deviceTypeList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.device_type:search',
+    dataSource: 'dev.device_type:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.device_type",
+    voPermission: "dev.device_type.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -102,9 +102,9 @@ const deviceTypeList = () => {
     },
   };
   const onSaveDeviceType = () => {
-    let addOptions = 'sys.device_type:save'
+    let addOptions = 'dev.device_type:save'
     let addDeviceTypeData = formRef.current.getFieldValue();
-    Tools.verify('sys.vf_device_type', addDeviceTypeData, (result, err) => {
+    Tools.verify('dev.vf_device_type', addDeviceTypeData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err, 'error');
         return;
@@ -131,9 +131,9 @@ const deviceTypeList = () => {
     <>
       <PageContainer
         header={{
-          title: '设备类型管理',
+          title: '产品类型管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '硬件管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >

@@ -6,7 +6,7 @@ import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
 
-const dictionaryList = () => {
+const modelList = () => {
 
   const table = useRef();
   const formRef = useRef();
@@ -88,12 +88,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.model:search',
+    dataSource: 'dev.model:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.model",
+    voPermission: "dev.model.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -104,9 +104,9 @@ const dictionaryList = () => {
     },
   };
   const onSaveModel = () => {
-    let addOptions = 'sys.model:save'
+    let addOptions = 'dev.model:save'
     let addModelData = formRef.current.getFieldValue();
-    Tools.verify('sys.vf_model', addModelData, (result, err) => {
+    Tools.verify('dev.vf_model', addModelData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err, 'error');
         return;
@@ -134,7 +134,7 @@ const dictionaryList = () => {
         header={{
           title: '模组管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '硬件管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -164,4 +164,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default modelList;

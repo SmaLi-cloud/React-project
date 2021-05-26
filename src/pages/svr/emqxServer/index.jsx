@@ -6,7 +6,7 @@ import * as Tools from '@/utils/tools';
 import styles from './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
 
-const dictionaryList = () => {
+const emqxServerList = () => {
 
   const table = useRef();
   const formRef = useRef();
@@ -36,6 +36,7 @@ const dictionaryList = () => {
       key: 'isOnline',
       type: 'select',
       colSpan: 1,
+      defaultValue:'',
       dataSource: [{ label: "在线", value: 1 }, { label: "离线", value: 0 }],
     },
     {
@@ -43,6 +44,7 @@ const dictionaryList = () => {
       key: 'status',
       type: 'select',
       colSpan: 1,
+      defaultValue:'',
       dataSource: [{ label: "启用", value: "1" }, { label: "禁用", value: "0" }],
     },
   ];
@@ -121,7 +123,7 @@ const dictionaryList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        let deleteOptions = 'sys.emqx_server:delete'
+        let deleteOptions = 'svr.emqx_server:delete'
         let deletEmqxServerData = {};
         deletEmqxServerData.emqxServerId = record.id;
         Tools.callAPI(deleteOptions, deletEmqxServerData, (result) => {
@@ -146,12 +148,12 @@ const dictionaryList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.emqx_server:search',
+    dataSource: 'svr.emqx_server:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.emqx_server",
+    voPermission: "svr.emqx_server.list",
   };
   const formItemLayout = {
     labelCol: {
@@ -162,9 +164,9 @@ const dictionaryList = () => {
     },
   };
   const onSaveThirdPartySystem = () => {
-    let addOptions = 'sys.emqx_server:save'
+    let addOptions = 'svr.emqx_server:save'
     let addEmqxServerData = formRef.current.getFieldValue();
-    Tools.verify('sys.vf_emqx_server', addEmqxServerData, (result, err) => {
+    Tools.verify('svr.vf_emqx_server', addEmqxServerData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err, 'error');
         return;
@@ -190,9 +192,9 @@ const dictionaryList = () => {
     <>
       <PageContainer
         header={{
-          title: 'MQTT服务',
+          title: 'MQTT服务器管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '接口服务管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >
@@ -234,4 +236,4 @@ const dictionaryList = () => {
   );
 };
 
-export default dictionaryList;
+export default emqxServerList;

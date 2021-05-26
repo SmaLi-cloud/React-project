@@ -19,7 +19,7 @@ class VoTreeSelect extends React.Component {
           if (this.props.widthParentId) {
             const parents = Tools.getTreeParent(this.buildTreeDate, "children", this.props.parentFiledName, this.props.keyFiledName, v)
             if (parents) {
-              selectedIds.add(...parents);
+              selectedIds = new Set([...selectedIds, ...parents]);
             }
           }
         });
@@ -54,6 +54,7 @@ class VoTreeSelect extends React.Component {
     const tProps = {
       treeData: this.buildTreeDate,
       onChange: this.onChange,
+      onSelect: this.props.onSelect,
       labelInValue: false,
       treeCheckable: this.props.treeCheckable,
       placeholder: this.props.placeholder,

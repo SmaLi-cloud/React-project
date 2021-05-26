@@ -16,7 +16,7 @@ const RoleList = (props) => {
   const [adjustModal, setAdjustModal] = useState({});
   const searchs = [
     {
-      title: '名字',
+      title: '角色名称',
       key: 'name',
       type: 'input',
       colSpan: 1,
@@ -48,6 +48,7 @@ const RoleList = (props) => {
       title: '拥有权限',
       dataIndex: 'permissionNames',
       key: 'permissionNames',
+      width:800,
       render: (tag) => {
         let tagStr = Tools.cloneDeep(tag).toString()
         return (
@@ -93,6 +94,7 @@ const RoleList = (props) => {
       type: "link",
       icon: <EditOutlined />,
       onClick: async (record) => {
+        Tools.logMsg(record)
         await setAdjustModal({ title: '修改角色', disabled: true, isModalVisible: true });
         let staffOptions = [];
         if (record.staffIds.length) {
@@ -112,7 +114,7 @@ const RoleList = (props) => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        Tools.callAPI('sys.role:delete', { roleId: record.id }, (result) => {
+        Tools.callAPI('co.role:delete', { roleId: record.id }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
@@ -134,13 +136,13 @@ const RoleList = (props) => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.role:search',
+    dataSource: 'co.role:search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
     // rowSelectType: 'checkbox',
-    voPermission: "sys.staff.role",
+    voPermission: "co.role",
   };
   const formItemLayout = {
     labelCol: {
@@ -151,17 +153,14 @@ const RoleList = (props) => {
     },
   };
   const onSaveRole = () => {
-    let addOptions = 'sys.role:save'
-    let addStaffData = formRef.current.getFieldValue();
-    if (!addStaffData.staffIds) {
-      addStaffData.staffIds = [];
-    }
-    Tools.verify('sys.vf_role', addStaffData, (result, err) => {
+    let addOptions = 'co.role:save'
+    let addRoleData = formRef.current.getFieldValue();
+    Tools.verify('co.vf_role', addRoleData, (result, err) => {
       if (!result) {
         Tools.showMessage('保存失败', err, 'error');
         return;
       }
-      Tools.callAPI(addOptions, { roleInfo: addStaffData }, (result) => {
+      Tools.callAPI(addOptions, { roleInfo: addRoleData }, (result) => {
         if (result.success) {
           message.success('保存成功');
           setAdjustModal({ isModalVisible: false })
@@ -181,8 +180,6 @@ const RoleList = (props) => {
   useEffect(() => {
     Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
-        Tools.logMsg("setTreeData")
-        Tools.logMsg(result.data.rows)
         setTreeData(result.data.rows);
       }
     });
@@ -193,7 +190,7 @@ const RoleList = (props) => {
         header={{
           title: '角色管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '公司管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >

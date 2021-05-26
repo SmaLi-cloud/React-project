@@ -76,7 +76,7 @@ const apiLogList = () => {
       needRowSelected: true,
       icon: <DeleteOutlined />,
       onClick: () => {
-        Tools.callAPI('sys.log:api_delete_by_ids', { ids: table.current.state.selectedRowKeys }, (result) => {
+        Tools.callAPI('log.log:api_delete_by_ids', { ids: table.current.state.selectedRowKeys }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
@@ -122,7 +122,7 @@ const apiLogList = () => {
       type: "link",
       icon: <DeleteOutlined />,
       onClick: function (record) {
-        Tools.callAPI('sys.log:api_delete', { logId: record.id }, (result) => {
+        Tools.callAPI('log.log:api_delete', { logId: record.id }, (result) => {
           if (result.success) {
             message.success('删除成功');
             table.current.state.selectedRowKeys = []
@@ -144,22 +144,22 @@ const apiLogList = () => {
     searchs,
     opCols,
     toolBar,
-    dataSource: 'sys.log:api_search',
+    dataSource: 'log.log:api_search',
     otherConfig: {
       rowKey: "id",
       bordered: true,
     },
     rowSelectType: 'checkbox',
-    voPermission: "sys.staff.log",
+    voPermission: "log.api_log.list",
   };
 
   return (
     <>
       <PageContainer
         header={{
-          title: '日志文件',
+          title: 'API日志管理',
           breadcrumb: {
-            routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
+            routes: [{ breadcrumbName: '日志管理' }, { breadcrumbName: '当前页面' }]
           }
         }}
       >

@@ -5,9 +5,11 @@ import { EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import * as Tools from '@/utils/tools';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
+import VoTreeSelect from '@/components/Vo/VoTreeSelect';
 
 
-const tableList = () => {
+
+const permissionList = () => {
   const formRef = useRef();
   const table = useRef();
   const [treeData, setTreeData] = useState([]);
@@ -16,7 +18,6 @@ const tableList = () => {
   useEffect(() => {
     Tools.callAPI('sys.permission:search', { conditions: {}, page: 1, size: 10000 }, (result) => {
       if (result.success) {
-        // let treeData = Tools.buildTree(result.data.rows, 'id', 'parentId', 'children', "")
         setTreeData(result.data.rows)
       }
     });
@@ -190,10 +191,14 @@ const tableList = () => {
       rowKey: "id",
       bordered: true,
     },
-    voPermission: "sys.staff.list",
+    voPermission: "sys.permission.list",
   };
   const tProps = {
-    treeData,
+    treeData:treeData,
+    widthParentId:true,
+    keyFiledName:"id",
+    parentFiledName:"parentId",
+    rootParentValue:"",
     onSelect: onTreeSelect,
     placeholder: '请选择父权限',
     style: {
@@ -203,7 +208,7 @@ const tableList = () => {
   return (
     <PageContainer
       header={{
-        title: '权限管理',
+        title: '权限点管理',
         breadcrumb: {
           routes: [{ breadcrumbName: '系统管理' }, { breadcrumbName: '当前页面' }]
         }
@@ -216,7 +221,7 @@ const tableList = () => {
           {...formItemLayout}
           onFinish={onAddPermission} >
           <Form.Item label="父权限" name="parentId">
-            <TreeSelect {...tProps} disabled={adjustModal.disabled} />
+            <VoTreeSelect {...tProps} disabled={adjustModal.disabled} />
           </Form.Item>
           <Form.Item label="权限名称" name="name" rules={[{ required: true }]}>
             <Input />
@@ -238,4 +243,4 @@ const tableList = () => {
   );
 };
 
-export default tableList;
+export default permissionList;

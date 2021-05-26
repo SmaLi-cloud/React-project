@@ -51,14 +51,16 @@ function callAPI(action, data, successCallback, errorCallback, noMask) {
       result = lineToHump(result);
       sendEvent('setMaskState', false);
       if (result.needLogin) {
-        let queryString = stringify({
-          redirect: window.location.href,
+        showMessage('登录失效', '您当前的登录已失效，请重新登录！', 'error', () => {
+          let queryString = stringify({
+            redirect: window.location.href,
+          });
+          if (queryString) {
+            window.location.href = '/user/login?' + queryString;
+          } else {
+            window.location.href = '/user/login';
+          }
         });
-        if(queryString){
-          window.location.href = config.prefix + '/user/login?' + queryString;
-        }else {
-          window.location.href = config.prefix + '/user/login';
-        }
       }
       if (successCallback) {
         successCallback(result);
@@ -291,7 +293,6 @@ function getVerifyRule(rouleName, callback) {
 
 function verify(rouleName, data, callback) {
   getVerifyRule(rouleName, function (verifyRules) {
-    console.log(verifyRules);
     verifyMsg = [];
     var checkFlag = true;
     for (var key in verifyRules) {
@@ -323,7 +324,7 @@ function verifyItem(key, verifyRule, data) {
   for (var i = 0; i < verifyRule.verifications.length; i++) {
     let verification = verifyRule.verifications[i];
     if (verification.type === 'empty') {
-      if (!inputValue) {
+      if (inputValue === '' || (inputValue instanceof Array && inputValue.length == 0)) {
         if (verification.errMsg) {
           verifyMsg.push(verification.errMsg);
           return false;
@@ -422,6 +423,9 @@ function verifyItem(key, verifyRule, data) {
 }
 
 function showMessage(title, messages, type, callback) {
+  if (typeof messages == 'undefined') {
+    messages = 'undefined';
+  }
   if (!(messages instanceof Array)) {
     messages = messages.split('\n');
   }
@@ -429,18 +433,18 @@ function showMessage(title, messages, type, callback) {
   messages.forEach((message, i) => {
     children.push(<div key={i}>{message}</div>);
   });
-  if(!type){
-  Modal.error({
-    title: title,
-    content: <div>{children}</div>,
-    onOk:callback
-  });
+  if (!type) {
+    Modal.error({
+      title: title,
+      content: <div>{children}</div>,
+      onOk: callback,
+    });
   } else {
     Modal[type]({
       title: title,
-        content: <div>{children}</div>,
-        onOk:callback
-    })
+      content: <div>{children}</div>,
+      onOk: callback,
+    });
   }
 }
 function cloneDeep(data) {

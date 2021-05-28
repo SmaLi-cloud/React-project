@@ -119,7 +119,7 @@ class VoTable extends React.Component {
                         <Form.Item
                             labelAlign='right'
                             labelCol={{
-                                span: 8 / this.props.searchs[i].colSpan,
+                                span: 6 / this.props.searchs[i].colSpan,
                             }}
                             name={this.props.searchs[i].key}
                             label={this.props.searchs[i].title}

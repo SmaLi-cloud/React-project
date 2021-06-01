@@ -149,7 +149,7 @@ class VoTable extends React.Component {
                         )
                     } else {
                         children.push(
-                            <Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon} icon={v.icon}>{v.title}</Button>
+                            <Button disabled={v.needRowSelected && this.state.selectedRowKeys.length == 0} type={v.type} onClick={v.onClick} style={{ marginLeft: 20 }} key={v.key} icon={v.icon}>{v.title}</Button>
                         )
                     }
 
